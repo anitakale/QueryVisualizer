@@ -1,0 +1,83 @@
+﻿.popoutButton {
+    position: absolute;
+    top: 10px;
+    right: 40px;
+    border: none;
+    background-color: var(--buic-background-titlebar)
+}
+
+.popoutWrapper {
+    opacity: 0.9;
+    height: 100%;
+
+    .max-width {
+        width: 100%;
+    }
+
+    .max-height {
+        height: 100%;
+    }
+
+    .drawingSelectortext {
+        position: absolute;
+        bottom: 5px;
+        width: calc(100% - 20px);
+    }
+
+    .drawingSelectorDropDownExternal {
+        position: absolute;
+        bottom: 0px;
+        padding: 0px 10px 0px 10px;
+    }
+
+    .uicore-inputs-select {
+        width: 100%;
+    }
+
+    &:hover {
+        opacity: 1;
+    }
+
+    .imodel-viewport-dialog-container {
+        /* Required so Viewport does not overlap title bar */
+        position: relative;
+        width: 100%;
+        height: 100%;
+    }
+
+    .drawingSelectortext {
+        position: absolute;
+        bottom: 5px;
+        width: calc(100% - 20px);
+    }
+
+    .drawingSelectorDropDown {
+        position: absolute;
+        bottom: 0px;
+        padding: 0px 10px 0px 10px;
+        width: 100%;
+
+        .uicore-inputs-select {
+            width: 100%;
+        }
+    }
+
+    .drawingSelectortext {
+        color: black;
+        left: 10px;
+        background-color: white;
+        display: flex;
+        align-items: center;
+        height: 38px;
+        padding: 0px 10px 0px 10px;
+        border-radius: 3px;
+    }
+
+    .drawingSelectorDropDown {
+        .uicore-inputs-select {
+            height: 38px;
+            border: none;
+            box-shadow: none;
+        }
+    }
+}

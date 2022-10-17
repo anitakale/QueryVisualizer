@@ -1,0 +1,43 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+  branches:
+    include:
+    - main
+
+stages:
+  - stage: 'build_siemens_itwin_widgets'
+    displayName: 'Build Siemens iTwin Widgets'
+    jobs:
+      - job: 'build_source'
+        condition: not(contains(variables['Build.SourceVersionMessage'], '[skip ci]'))
+        displayName: 'Build, Test and Publish'
+        pool:
+          vmImage: 'ubuntu-latest'
+        steps:
+          - template: azure-pipelines.yml
+
+          - script: |
+              echo 'Exclude authenticated npmrc files from git changes'
+              git update-index --skip-worktree common/config/rush/.npmrc
+              git update-index --skip-worktree common/config/rush/.npmrc-publish
+              echo 'Use same npmrc file for publishing'
+              cp common/config/rush/.npmrc common/config/rush/.npmrc-publish
+              node common/scripts/install-run-rush.js version --bump
+              node common/scripts/install-run-rush.js update
+              git diff --quiet && git diff --staged --quiet || git commit -am '[skip ci]: Adding updated package.json files and shrinkwrap file'
+              git push
+              node common/scripts/install-run-rush.js publish --include-all --apply --publish --target-branch main
+              node common/scripts/install-run-rush.js publish --pack --include-all --publish --release-folder $(Build.ArtifactStagingDirectory)/packages
+            displayName: 'Publish to //pkgs.dev.azure.com/bentleycs/_packaging/Packages/npm/registry/'
+            condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/main'), startsWith(variables['Build.SourceBranch'], 'refs/heads/release/'), eq(variables['Build.ShouldPublish'], 'true')))
+
+          - template: publish-artifact.yaml
+            parameters:
+              pathToPublish: '$(Build.ArtifactStagingDirectory)/packages'
+              artifactName: 'packages'
+              publishLocation: 'Container'
+              customCondition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/main'), startsWith(variables['Build.SourceBranch'], 'refs/heads/release/'), eq(variables['Build.ShouldPublish'], 'true')))
