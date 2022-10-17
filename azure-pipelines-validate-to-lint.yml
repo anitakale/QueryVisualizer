@@ -1,0 +1,62 @@
+steps:
+  # 1. Configure node
+  - task: NodeTool@0
+    inputs:
+      versionSpec: '14.19.0'
+    displayName: 'Use node 14.19.0'
+
+  # 2. Checkout
+  - checkout: self
+    persistCredentials: true
+    clean: true
+    displayName: 'Checkout this branch'
+
+  # 3. Set npm config path, Creating .npmrc in $(agent.tempdirectory)
+  - script: |
+      echo registry=https://pkgs.dev.azure.com/bentleycs/_packaging/Packages/npm/registry/ > $(agent.tempdirectory)/.npmrc
+      echo always-auth=true >> $(agent.tempdirectory)/.npmrc
+      cat $(agent.tempdirectory)/.npmrc
+    displayName: 'Set npm config path'
+    env:
+      NVMRC_PATH: $(agent.tempdirectory)/.npmrc
+
+  # 4. npmAuthenticate
+  - task: npmAuthenticate@0
+    inputs:
+      workingFile: 'common/config/rush/.npmrc'
+    displayName: 'Authorize common/config/rush/.npmrc'
+  - task: npmAuthenticate@0
+    displayName: 'Authorize $(agent.tempdirectory)/.npmrc'
+    inputs:
+      workingFile: '$(agent.tempdirectory)/.npmrc'
+
+  # 5. Configure git
+  - script: 'git config --local user.email rushbot@bentley.com'
+    displayName: 'Git config email'
+  - script: 'git config --local user.name Rushbot'
+    displayName: 'Git config name'
+
+  - bash: echo '##vso[task.setvariable variable=npm_config_userconfig]$(agent.tempdirectory)/.npmrc'
+    displayName: Set new variable npm_config_userconfig
+
+  # 6. Install npm packages
+  - script: |
+      echo 'Rush update'
+      node common/scripts/install-run-rush.js update
+    displayName: 'Install - rush update'
+    env:
+      npm_config_userconfig: $(npm_config_userconfig)
+
+  # Currently gives error rimraf not found
+  # # 7.Rush clean
+  # - script: |
+  #     echo 'Rush Clean'
+  #     node common/scripts/install-run-rush.js clean --verbose
+  #   displayName: 'Rush clean'
+
+  # 0 Run Lint as early as possible.
+  - script: |
+      echo 'lint Source'
+      node common/scripts/install-run-rush.js lint --verbose
+    displayName: 'Validate Build - rush lint'
+    continueOnError: false

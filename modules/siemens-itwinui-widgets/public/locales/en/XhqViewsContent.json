@@ -1,0 +1,14 @@
+{
+  "OIView": "OI View",
+  "OIViewDialog": "OI View Dialog",
+  "operIntlNavigation": {
+    "confirmationModal": {
+      "title": "Confirm Navigation",
+      "confirm": "Confirm",
+      "cancel": "Cancel",
+      "warning": "You will be redirecting to Operational Intelligence App. This will may take some time.",
+      "confirmationMessage": "Press Confirm to continue or Cancel to stay on same page."
+    },
+    "navigateToLinkTitle":"Go To Operational Intelligence"
+  }
+}
