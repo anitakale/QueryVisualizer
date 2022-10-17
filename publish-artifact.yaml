@@ -1,0 +1,15 @@
+parameters: 
+  pathToPublish: ''
+  artifactName: ''
+  publishLocation: ''
+  customCondition: ''
+
+steps:
+- ${{ if and( ne(parameters.pathToPublish, ''), ne(parameters.artifactName, ''), ne(parameters.customCondition, '') ) }}:
+  - task: PublishBuildArtifacts@1
+    displayName: 'Publish Artifact: ${{ parameters.artifactName }}'
+    inputs:
+      PathToPublish: ${{ parameters.pathToPublish }}
+      ArtifactName: ${{ parameters.artifactName }}
+      publishLocation: ${{ parameters.publishLocation}}
+    condition: ${{ parameters.customCondition }}
