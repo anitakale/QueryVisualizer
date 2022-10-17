@@ -80,20 +80,6 @@ steps:
         ls -l
     displayName: Added package.json temporarily.
 
-  - script: |
-      cd common/config/rush/
-      output="$(pnpm audit --prod --registry=https://registry.npmjs.org/)"
-      echo "${output}"
-      if [[ "$output" == *"high"* ]]; then
-        printf '%s\n' "high vulnerability package(s) found" >&2 # write error message to stderr
-        exit 1
-      fi
-      if [[ "$output" == *"critical"* ]]; then
-        printf '%s\n' "critical vulnerability package(s) found" >&2
-        exit 1
-      fi
-    displayName: Run pnpm audit prod only.
-
   # Deleting the temporarily created package.json after pnpm audit.
   - task: Bash@3
     inputs:
