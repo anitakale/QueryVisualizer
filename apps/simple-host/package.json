@@ -48,7 +48,9 @@
     "start": "react-scripts --max_old_space_size=4096 start",
     "build": "react-scripts --max_old_space_size=4096 build",
     "test": "react-scripts --max_old_space_size=4096 test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "lint:fix": "eslint --ext .ts,.tsx,.js ./src/ --fix",
+    "lint": "eslint --ext .ts,.tsx,.js ./src/"
   },
   "eslintConfig": {
     "extends": [
