@@ -42,9 +42,10 @@
     "@itwin/property-grid-react": "~0.8.1",
     "@bentley/itwin-saved-views": "4.14.5",
     "@itwin/tree-widget-react": "^0.4.7",
-    "@bentley/siemens-itwinui-widgets": "3.2.8-dev.29",
+    "@bentley/siemens-itwinui-widgets": "3.2.11",
     "@bentley/itwin-markup-frontstage": "2.14.5",
-    "@bentley/isv-common-utilities": "3.2.8-dev.29"
+    "@bentley/isv-common-utilities": "3.2.11",
+    "@svgr/webpack": "^5.5.0"
   },
   "scripts": {
     "start": "react-scripts --max_old_space_size=4096 start",

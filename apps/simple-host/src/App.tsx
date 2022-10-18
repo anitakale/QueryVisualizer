@@ -16,7 +16,7 @@ import {
   ViewerNavigationToolsProvider,
   ViewerPerformance
 } from "@itwin/web-viewer-react";
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { history } from "./history";
 import { ReducerRegistryInstance, StateManager, UiFramework } from "@itwin/appui-react";
 import { PropertyGridManager, PropertyGridUiItemsProvider } from "@itwin/property-grid-react";
@@ -25,12 +25,13 @@ import { AppUIProvider } from "./UIProviders/AppUIProvider";
 import { SiemensSampleAppReducer } from "./Store/SiemensSampleAppStore";
 import { XhqViewsManager } from "@bentley/siemens-itwinui-widgets";
 import { ITwinLocalization } from "@itwin/core-i18n";
-import { ISVCommonUtilitiesManager } from "@bentley/isv-common-utilities";
 
 const App: React.FC = () => {
   const [iModelId, setIModelId] = useState(process.env.IMJS_IMODEL_ID);
   const [contextId, setContextId] = useState(process.env.IMJS_ITWIN_ID); 
   const [changesetId, setChangesetId] = useState(process.env.IMJS_ITWIN_ID); 
+  const [xhqBaseURL,setXHQBaseURL] = useState(''); 
+  const [hideXhqNavbar,sethideXhqNavbar] = useState('0'); //Value to be passed from url is 1 or 0 
   const accessToken = useAccessToken();
 
   const publicAuthClient = useMemo(
@@ -72,17 +73,6 @@ const App: React.FC = () => {
     return "";
   }
 
-  const getPublicAccessToken = useCallback(async () => {
-    console.log("Inside getPrivateAccessToken");
-    return Promise.resolve(await publicAuthClient.getAccessToken() ?? "");
-  }, [publicAuthClient]);
-
-
-  const getPrivateAccessToken = useCallback(async () => {
-    console.log("Inside getPublicAccessToken");
-    return Promise.resolve(await privateAuthClient.getAccessToken() ?? "");
-  }, [privateAuthClient]);
-
   const login = useCallback(async () => {
     try {
       await publicAuthClient.signIn();
@@ -100,7 +90,9 @@ const App: React.FC = () => {
   useEffect(() => {
     setContextId(getURLParameterValue("contextId".toLocaleLowerCase()) || getURLParameterValue("projectId".toLocaleLowerCase()));
     setIModelId(getURLParameterValue("iModelId".toLocaleLowerCase()));
-    setChangesetId(getURLParameterValue("changesetId".toLocaleLowerCase()))
+    setChangesetId(getURLParameterValue("changesetId".toLocaleLowerCase()));
+    setXHQBaseURL(getURLParameterValue(("xhqbaseurl").toLocaleLowerCase()));
+    sethideXhqNavbar(getURLParameterValue(("hideXhqNavbar").toLocaleLowerCase()));
 }, []);
 
   useEffect(() => {
@@ -111,13 +103,18 @@ const App: React.FC = () => {
      if(iModelId)
       urlHistory =`${urlHistory}&iModelId=${iModelId}`
      if(changesetId)
-      urlHistory = `${urlHistory}&changesetId=${changesetId}`     
+      urlHistory = `${urlHistory}&changesetId=${changesetId}`
+     if(xhqBaseURL)
+      urlHistory = `${urlHistory}&xhqbaseurl=${xhqBaseURL}`    
+     if(hideXhqNavbar)
+      urlHistory = `${urlHistory}&hideXhqNavbar=${hideXhqNavbar}`
      history.push(urlHistory);
     }
-  }, [accessToken, contextId, iModelId, changesetId]);
+  }, [accessToken, contextId, iModelId, changesetId,xhqBaseURL,hideXhqNavbar]);
   
   const onIModelConnected = useCallback(async (iModel: IModelConnection) => {
     UiFramework.setIModelConnection(iModel, true);
+    await XhqViewsManager.initialize(IModelApp.localization as ITwinLocalization,iModel);
   },[]);
   
   const onIModelAppInit = useCallback(async () => {
@@ -128,7 +125,6 @@ const App: React.FC = () => {
     );
     await TreeWidget.initialize();
     await PropertyGridManager.initialize();
-    await XhqViewsManager.initialize(IModelApp.localization as ITwinLocalization);
   },[])
 
   const viewConfiguration = useCallback((viewPort: ScreenViewport) => {
@@ -186,7 +182,12 @@ const App: React.FC = () => {
         onIModelAppInit={onIModelAppInit}
         onIModelConnected={onIModelConnected}
         uiProviders={[
-          new AppUIProvider(),
+          new AppUIProvider({
+            XhqOptions:{
+              xhqBaseUrl:xhqBaseURL,
+              hideXhqNavbar: (hideXhqNavbar === '0')? false : true
+            }
+          }),
           new PropertyGridUiItemsProvider({
             enableCopyingPropertyText: true,
           }),

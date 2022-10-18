@@ -5,7 +5,7 @@ import { ModelessDialogManager, StateManager } from "@itwin/appui-react";
 import { AppUIProvider } from "../UIProviders/AppUIProvider";
 import { SiemensSampleAppActions } from "../Store/SiemensSampleAppStore";
 export class XhqViewsDialogStartup {
-  public static XhqViewsDialog(): React.ReactNode {
+  public static XhqViewsDialog(xhqOptions:IXhqOptions): React.ReactNode {
     const closeEvent = () => {
       ModelessDialogManager.closeDialog(AppUIProvider.XHQ_VIEWS_DIALOG_ID);
       StateManager.store.dispatch(SiemensSampleAppActions.setIsXhqViewsDialogOpen(false));
@@ -20,8 +20,8 @@ export class XhqViewsDialogStartup {
         opened={true}
         onClose={closeEvent}
         XhqOptions={{
-          xhqBaseUrl: "https://en.wikipedia.org/",
-          hideXhqNavbar: true,
+          xhqBaseUrl: xhqOptions.xhqBaseUrl,
+          hideXhqNavbar: xhqOptions.hideXhqNavbar,
           onClickNavigate: clickOnNavigateXhq,
         }}
       />
