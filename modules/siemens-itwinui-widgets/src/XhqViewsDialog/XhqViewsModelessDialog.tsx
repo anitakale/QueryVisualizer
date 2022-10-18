@@ -4,7 +4,6 @@ import React, { useState } from "react";
 import { XhqViewsContent } from "./XhqViewsContent";
 import { DialogStateCache } from "./DialogCache/DialogStateCache";
 import { Logger } from "@itwin/core-bentley";
-import { PopoutButton } from "../Popout/PopoutButton";
 import { ModelessDialog } from "@itwin/appui-react";
 import { XhqViewsManager } from "../XhqViewsManager";
 import { IXhqOptions } from "../XhqViewsDialog/interfaces";
@@ -141,14 +140,6 @@ export const XhqViewsModelessDialog = (
       ref={_setDialogElementRef}
       dialogId={XHQ_VIEWS_DIALOG_ID}
     >
-      <PopoutButton
-        windowId={XHQ_VIEWS_DIALOG_ID}
-        windowTitle={XhqViewsManager.translate("OIView")}
-        componentToPopout={_getDialogRef}
-        setDialogStateCallback={_setDialogState}
-        width={width}
-        height={height}
-      />
       <div className="imodel-viewport-dialog-container">
         <XhqViewsContent
          XhqOptions={props.XhqOptions}

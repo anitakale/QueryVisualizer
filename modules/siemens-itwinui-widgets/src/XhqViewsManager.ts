@@ -1,12 +1,15 @@
 // Copyright (c) Bentley Systems
 import { ITwinLocalization } from "@itwin/core-i18n";
 import { getClassName, UiError } from "@itwin/appui-abstract";
+import { ISVCommonUtilitiesManager } from "@bentley/isv-common-utilities";
+import { UiFramework } from "@itwin/appui-react";
 
 export class XhqViewsManager {
     private static _i18n?: ITwinLocalization;
 
     public static async initialize(i18n: ITwinLocalization): Promise<void> {
         XhqViewsManager._i18n = i18n;
+        ISVCommonUtilitiesManager.initialize(UiFramework.store);
         return XhqViewsManager._i18n.registerNamespace(XhqViewsManager.i18nNamespace);
     }
 
