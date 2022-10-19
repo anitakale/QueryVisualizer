@@ -4,6 +4,10 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 
 ## Environment Variables
 
+ ### Important Note ### 
+ ### **Please rename env.txt to .env before running so the env variables can be read at run time** ###
+
+
 Prior to running the app, you will need to add OIDC client configuration to the variables in the .env file:
 
 ```

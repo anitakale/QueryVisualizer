@@ -26,7 +26,6 @@ stages:
               git update-index --skip-worktree common/config/rush/.npmrc-publish
               echo 'Use same npmrc file for publishing'
               cp common/config/rush/.npmrc common/config/rush/.npmrc-publish
-              node common/scripts/install-run-rush.js version --bump
               node common/scripts/install-run-rush.js update
               git diff --quiet && git diff --staged --quiet || git commit -am '[skip ci]: Adding updated package.json files and shrinkwrap file'
               git push

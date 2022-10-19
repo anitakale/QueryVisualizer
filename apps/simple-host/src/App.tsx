@@ -16,41 +16,22 @@ import {
   ViewerNavigationToolsProvider,
   ViewerPerformance
 } from "@itwin/web-viewer-react";
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { history } from "./history";
-import { StateManager, UiFramework } from "@itwin/appui-react";
-import { ExternalDataUIManager, ExternalDataUIProvider, IPredefinedLink } from "@bentley/spg-external-data-ui";
+import { ReducerRegistryInstance, StateManager, UiFramework } from "@itwin/appui-react";
 import { PropertyGridManager, PropertyGridUiItemsProvider } from "@itwin/property-grid-react";
 import { TreeWidget } from "@itwin/tree-widget-react";
-
-
-const externalLink_WikipediaByElementCode: IPredefinedLink = {
-  caption: "Wikipedia By Element Code",
-  enabled: true,
-  index: 1,
-  url: "https://en.wikipedia.org/wiki/{elementCodeValue}"
-}
-const externalLink_WikipediaByFederatedGuid: IPredefinedLink = {
-  caption: "Wikipedia By Federated Guid",
-  enabled: true,
-  index: 2,
-  url: "https://en.wikipedia.org/wiki/{elementFedGuid}"
-}
-const externalLink_WikipediaOrg: IPredefinedLink = {
-  caption: "Wikipedia Org",
-  enabled: true,
-  index: 3,
-  url: "https://www.wikipedia.org/"
-}
+import { AppUIProvider } from "./UIProviders/AppUIProvider";
+import { SiemensSampleAppReducer } from "./Store/SiemensSampleAppStore";
+import { XhqViewsManager } from "@bentley/siemens-itwinui-widgets";
+import { ITwinLocalization } from "@itwin/core-i18n";
 
 const App: React.FC = () => {
   const [iModelId, setIModelId] = useState(process.env.IMJS_IMODEL_ID);
   const [contextId, setContextId] = useState(process.env.IMJS_ITWIN_ID); 
   const [changesetId, setChangesetId] = useState(process.env.IMJS_ITWIN_ID); 
-  const [externalDataSourceType,setExternalDataSourceType] = useState('');
-  const [externalDataPath,setExternalDataPath] = useState('');
-  const [synchSchemaType, setSynchSchemaType] = useState('');
-  const [synchFieldType, setSynchFieldType] = useState('');
+  const [xhqBaseURL,setXHQBaseURL] = useState(''); 
+  const [hideXhqNavbar,sethideXhqNavbar] = useState('0'); //Value to be passed from url is 1 or 0 
   const accessToken = useAccessToken();
 
   const publicAuthClient = useMemo(
@@ -92,23 +73,6 @@ const App: React.FC = () => {
     return "";
   }
 
-  const getPublicAccessToken = useCallback(async () => {
-    console.log("Inside getPrivateAccessToken");
-    return Promise.resolve(await publicAuthClient.getAccessToken() ?? "");
-  }, [publicAuthClient]);
-
-  const authPublic = useRef({
-    getAccessToken: getPublicAccessToken,
-  });
-
-  const getPrivateAccessToken = useCallback(async () => {
-    console.log("Inside getPublicAccessToken");
-    return Promise.resolve(await privateAuthClient.getAccessToken() ?? "");
-  }, [privateAuthClient]);
-  const authPrivate = useRef({
-    getAccessToken: getPrivateAccessToken,
-  });
-
   const login = useCallback(async () => {
     try {
       await publicAuthClient.signIn();
@@ -126,11 +90,9 @@ const App: React.FC = () => {
   useEffect(() => {
     setContextId(getURLParameterValue("contextId".toLocaleLowerCase()) || getURLParameterValue("projectId".toLocaleLowerCase()));
     setIModelId(getURLParameterValue("iModelId".toLocaleLowerCase()));
-    setExternalDataPath(getURLParameterValue("externalDataPath".toLocaleLowerCase()));
-    setExternalDataSourceType(getURLParameterValue("externalDataSourceType".toLocaleLowerCase()));
-    setChangesetId(getURLParameterValue("changesetId".toLocaleLowerCase()))
-    setSynchSchemaType(getURLParameterValue("synchSchemaType".toLocaleLowerCase()));
-    setSynchFieldType(getURLParameterValue("synchFieldType".toLocaleLowerCase()));
+    setChangesetId(getURLParameterValue("changesetId".toLocaleLowerCase()));
+    setXHQBaseURL(getURLParameterValue(("xhqbaseurl").toLocaleLowerCase()));
+    sethideXhqNavbar(getURLParameterValue(("hideXhqNavbar").toLocaleLowerCase()));
 }, []);
 
   useEffect(() => {
@@ -140,56 +102,27 @@ const App: React.FC = () => {
       urlHistory = `${urlHistory}contextId=${contextId}`
      if(iModelId)
       urlHistory =`${urlHistory}&iModelId=${iModelId}`
-     if(externalDataSourceType)
-      urlHistory =  `${urlHistory}&externalDataSourceType=${externalDataSourceType}`
-     if(externalDataPath)
-      urlHistory =  `${urlHistory}&externalDataPath=${externalDataPath}`
      if(changesetId)
-      urlHistory =  `${urlHistory}&changesetId=${changesetId}`
-     if (synchSchemaType)
-      urlHistory = `${urlHistory}&synchSchemaType=${synchSchemaType}`;
-     if (synchFieldType)
-      urlHistory = `${urlHistory}&synchFieldType=${synchFieldType}`;
-     
+      urlHistory = `${urlHistory}&changesetId=${changesetId}`
+     if(xhqBaseURL)
+      urlHistory = `${urlHistory}&xhqbaseurl=${xhqBaseURL}`    
+     if(hideXhqNavbar)
+      urlHistory = `${urlHistory}&hideXhqNavbar=${hideXhqNavbar}`
      history.push(urlHistory);
     }
-  }, [accessToken, contextId, iModelId, externalDataSourceType, externalDataPath, changesetId, synchFieldType, synchSchemaType]);
+  }, [accessToken, contextId, iModelId, changesetId,xhqBaseURL,hideXhqNavbar]);
   
-  const onIModelConnected = useCallback((iModel: IModelConnection) => {
+  const onIModelConnected = useCallback(async (iModel: IModelConnection) => {
     UiFramework.setIModelConnection(iModel, true);
-    ExternalDataUIManager.initialize(
-        UiFramework.store,
-        IModelApp.localization,
-        {
-          useDataProviderInfrastructureForPredefinedLinks: false,
-          accessToken: {
-            publicAccessToken: authPublic.current.getAccessToken,
-            privateAccessToken: authPrivate.current.getAccessToken,
-          },
-          externalDataProviderName: externalDataSourceType,
-          externalDataPath: externalDataPath,
-          predefinedLinksByType: {
-            embeddedLinks: {
-              WikiByCode: externalLink_WikipediaByElementCode,
-              WikiByFedGuid: externalLink_WikipediaByFederatedGuid,
-              WikiOrg: externalLink_WikipediaOrg,
-            },
-            externalLinks: {
-              WikiByCode: externalLink_WikipediaByElementCode,
-              WikiByFedGuid: externalLink_WikipediaByFederatedGuid,
-              WikiOrg: externalLink_WikipediaOrg,
-            },
-          },
-          syncOptions: {
-            SynchSchemaType: synchSchemaType,
-            SynchFieldType: synchFieldType
-          }
-        }
-      );
-  },[externalDataPath, externalDataSourceType, synchFieldType, synchSchemaType]);
+    await XhqViewsManager.initialize(IModelApp.localization as ITwinLocalization,iModel);
+  },[]);
   
   const onIModelAppInit = useCallback(async () => {
     await UiFramework.initialize(StateManager.store, undefined);
+    ReducerRegistryInstance.registerReducer(
+      "SiemensSampleApp",
+      SiemensSampleAppReducer
+    );
     await TreeWidget.initialize();
     await PropertyGridManager.initialize();
   },[])
@@ -249,7 +182,12 @@ const App: React.FC = () => {
         onIModelAppInit={onIModelAppInit}
         onIModelConnected={onIModelConnected}
         uiProviders={[
-          new ExternalDataUIProvider(),
+          new AppUIProvider({
+            XhqOptions:{
+              xhqBaseUrl:xhqBaseURL,
+              hideXhqNavbar: (hideXhqNavbar === '0')? false : true
+            }
+          }),
           new PropertyGridUiItemsProvider({
             enableCopyingPropertyText: true,
           }),
