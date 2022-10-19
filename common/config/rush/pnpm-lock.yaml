@@ -3,12 +3,12 @@ lockfileVersion: 5.3
 specifiers:
   '@bentley/eslint-plugin': ^2.19.38
   '@bentley/icons-generic': ^1.0.34
-  '@bentley/isv-common-utilities': 3.2.11
+  '@bentley/isv-common-utilities': 3.2.12
   '@bentley/itwin-markup-frontstage': 2.14.5
   '@bentley/itwin-saved-views': 4.14.5
   '@bentley/product-settings-client': ~3.2.1
   '@bentley/react-scripts': 4.0.7
-  '@bentley/spg-external-data-providers': 3.2.11
+  '@bentley/spg-external-data-providers': 3.2.12
   '@bentley/wsg-client': 2.3.0
   '@itwin/appui-abstract': ~3.2.8
   '@itwin/appui-layout-react': ~3.2.8
@@ -69,12 +69,12 @@ specifiers:
 dependencies:
   '@bentley/eslint-plugin': 2.19.46_eslint@7.32.0+typescript@4.4.4
   '@bentley/icons-generic': 1.0.34
-  '@bentley/isv-common-utilities': 3.2.11_4b7d9c0995d7782da3d536e68a81e21e
+  '@bentley/isv-common-utilities': 3.2.12_d6ad3e584eedb92817bf216e58d6f8ef
   '@bentley/itwin-markup-frontstage': 2.14.5_be3b7fcd0f49fcc3acbb352f67c42a65
   '@bentley/itwin-saved-views': 4.14.5_f09a9a1af11df3d4e952455b847f4919
   '@bentley/product-settings-client': 3.2.1_a69f1f70cd88bf4e0b5f99c08298427f
   '@bentley/react-scripts': 4.0.7_react@17.0.2+typescript@4.4.4
-  '@bentley/spg-external-data-providers': 3.2.11_fe0a974bc93092b03b2e18cb4c25bc99
+  '@bentley/spg-external-data-providers': 3.2.12_4d539862df45895e452257c5f2b33da3
   '@bentley/wsg-client': 2.3.0_@itwin+core-bentley@3.2.9
   '@itwin/appui-abstract': 3.2.9_@itwin+core-bentley@3.2.9
   '@itwin/appui-layout-react': 3.2.9_fe47481e586e70571a9acfc0207aca72
@@ -106,7 +106,7 @@ dependencies:
   '@itwin/tree-widget-react': 0.4.7_baf2156464fe132f838c604ee6c7f69d
   '@itwin/web-viewer-react': 3.0.6_5b13675f9a5c80bff69a5ae705fc292f
   '@itwin/webgl-compatibility': 3.2.9
-  '@rush-temp/siemens-itwinui-widgets': file:projects/siemens-itwinui-widgets.tgz_49e813662f2adf6e0b79e25afd8eb015
+  '@rush-temp/siemens-itwinui-widgets': file:projects/siemens-itwinui-widgets.tgz_ed2b8756eb9282c383985f132ba76263
   '@rush-temp/simple-host': file:projects/simple-host.tgz_044db467d2b7b94719e5def06496f745
   '@svgr/webpack': 5.5.0
   '@types/history': 4.7.11
@@ -1714,6 +1714,40 @@ packages:
       - react-native
     dev: false
 
+  /@bentley/isv-common-utilities/3.2.12_d6ad3e584eedb92817bf216e58d6f8ef:
+    resolution: {integrity: sha1-zd2NIWOEUR590Iu93sDdXxNS1tU=}
+    peerDependencies:
+      '@itwin/appui-abstract': ^3.2.8
+      '@itwin/appui-react': ^3.2.8
+      '@itwin/core-bentley': ^3.2.8
+      '@itwin/core-common': ^3.2.8
+      '@itwin/core-frontend': ^3.2.8
+      '@itwin/core-geometry': ^3.2.8
+      '@itwin/core-i18n': ^3.2.8
+      '@itwin/presentation-common': ^3.2.8
+      '@itwin/presentation-components': ^3.2.8
+      '@itwin/presentation-frontend': ^3.2.8
+    dependencies:
+      '@itwin/appui-abstract': 3.2.9_@itwin+core-bentley@3.2.9
+      '@itwin/appui-react': 3.2.9_dc137ab6ee69fb3821746bd301bc4166
+      '@itwin/core-bentley': 3.2.9
+      '@itwin/core-common': 3.2.9_b5d1bad302775c64d026581e85ad7ea9
+      '@itwin/core-frontend': 3.2.9_b146a1b6ce396080432173d5e55cb7f4
+      '@itwin/core-geometry': 3.2.9
+      '@itwin/core-i18n': 3.2.9_@itwin+core-bentley@3.2.9
+      '@itwin/presentation-common': 3.2.9_6b98b24fc421c1ddc5f8ffa866d95990
+      '@itwin/presentation-components': 3.2.9_29bc29a3e1d039ea9baf15f3426046f1
+      '@itwin/presentation-frontend': 3.2.9_e567f26589c1226156c0d14511dbdf49
+      lodash: 4.17.21
+      micro-memoize: 4.0.11
+      react: 17.0.2
+      react-dom: 17.0.2_react@17.0.2
+      react-redux: 7.2.9_react-dom@17.0.2+react@17.0.2
+      redux: 4.2.0
+    transitivePeerDependencies:
+      - react-native
+    dev: false
+
   /@bentley/isv-common-utilities/3.2.8-dev.29_4b7d9c0995d7782da3d536e68a81e21e:
     resolution: {integrity: sha1-thjY80vfSOPxayzZmjNEsJ9n81c=}
     peerDependencies:
@@ -2015,14 +2049,18 @@ packages:
       - supports-color
     dev: false
 
-  /@bentley/spg-external-data-providers/3.2.11_fe0a974bc93092b03b2e18cb4c25bc99:
-    resolution: {integrity: sha1-T6hMRlB15ILozUoysCCVqCxU57c=}
+  /@bentley/spg-external-data-providers/3.2.12_4d539862df45895e452257c5f2b33da3:
+    resolution: {integrity: sha1-kpTIkIvrRB5MoWMCIrSMm7zT1f0=}
     peerDependencies:
+      '@bentley/wsg-client': 2.3.0
+      '@itwin/appui-react': ^3.2.8
       '@itwin/core-bentley': ^3.2.8
       '@itwin/core-common': ^3.2.8
       '@itwin/core-frontend': ^3.2.8
+      micro-memoize: ^4.0.9
+      react: ^17.0.2
     dependencies:
-      '@bentley/isv-common-utilities': 3.2.11_4b7d9c0995d7782da3d536e68a81e21e
+      '@bentley/isv-common-utilities': 3.2.12_d6ad3e584eedb92817bf216e58d6f8ef
       '@bentley/wsg-client': 2.3.0_@itwin+core-bentley@3.2.9
       '@itwin/appui-react': 3.2.9_dc137ab6ee69fb3821746bd301bc4166
       '@itwin/core-bentley': 3.2.9
@@ -2033,21 +2071,12 @@ packages:
       react: 17.0.2
     transitivePeerDependencies:
       - '@itwin/appui-abstract'
-      - '@itwin/appui-layout-react'
-      - '@itwin/components-react'
       - '@itwin/core-geometry'
-      - '@itwin/core-markup'
-      - '@itwin/core-quantity'
-      - '@itwin/core-react'
-      - '@itwin/imodel-components-react'
+      - '@itwin/core-i18n'
       - '@itwin/presentation-common'
+      - '@itwin/presentation-components'
       - '@itwin/presentation-frontend'
-      - encoding
-      - react-dom
       - react-native
-      - react-redux
-      - redux
-      - supports-color
     dev: false
 
   /@bentley/spg-external-data-providers/3.2.8-dev.29_fe0a974bc93092b03b2e18cb4c25bc99:
@@ -6492,7 +6521,7 @@ packages:
       postcss-modules-values: 3.0.0
       postcss-value-parser: 4.2.0
       schema-utils: 2.7.1
-      semver: 7.3.2
+      semver: 7.3.8
       webpack: 4.44.2
     dev: false
 
@@ -14381,7 +14410,7 @@ packages:
       neo-async: 2.6.2
       sass: 1.55.0
       schema-utils: 3.1.1
-      semver: 7.3.2
+      semver: 7.3.8
       webpack: 4.44.2
     dev: false
 
@@ -15637,7 +15666,7 @@ packages:
       lodash: 4.17.21
       make-error: 1.3.6
       mkdirp: 1.0.4
-      semver: 7.3.2
+      semver: 7.3.8
       typescript: 4.4.4
       yargs-parser: 20.2.9
     dev: false
@@ -16825,15 +16854,15 @@ packages:
       commander: 2.20.3
     dev: false
 
-  file:projects/siemens-itwinui-widgets.tgz_49e813662f2adf6e0b79e25afd8eb015:
-    resolution: {integrity: sha512-4+ijwa9HEDujgCw8545ey5vhZwqOisw3jliqzvxggqe9ii7K8ulo3cVdzLQFCOiBtN3K2JuTLSLxexmZjp4lZg==, tarball: file:projects/siemens-itwinui-widgets.tgz}
+  file:projects/siemens-itwinui-widgets.tgz_ed2b8756eb9282c383985f132ba76263:
+    resolution: {integrity: sha512-UC9lQc+8XUmdvv/NuIKOCn78OtqMMPV5d+JKgTroPIoyqCt1GX+kHRALbN4/FUCqiQa4cM/pBO7bhyIh88V2Ow==, tarball: file:projects/siemens-itwinui-widgets.tgz}
     id: file:projects/siemens-itwinui-widgets.tgz
     name: '@rush-temp/siemens-itwinui-widgets'
     version: 0.0.0
     dependencies:
       '@bentley/eslint-plugin': 2.19.46_eslint@7.32.0+typescript@4.4.4
-      '@bentley/isv-common-utilities': 3.2.11_4b7d9c0995d7782da3d536e68a81e21e
-      '@bentley/spg-external-data-providers': 3.2.11_fe0a974bc93092b03b2e18cb4c25bc99
+      '@bentley/isv-common-utilities': 3.2.12_d6ad3e584eedb92817bf216e58d6f8ef
+      '@bentley/spg-external-data-providers': 3.2.12_4d539862df45895e452257c5f2b33da3
       '@itwin/appui-abstract': 3.2.9_@itwin+core-bentley@3.2.9
       '@itwin/appui-react': 3.2.9_dc137ab6ee69fb3821746bd301bc4166
       '@itwin/build-tools': 3.4.0
@@ -16853,6 +16882,7 @@ packages:
       react: 17.0.2
       typescript: 4.4.4
     transitivePeerDependencies:
+      - '@bentley/wsg-client'
       - '@itwin/appui-layout-react'
       - '@itwin/components-react'
       - '@itwin/core-common'
@@ -16862,9 +16892,11 @@ packages:
       - '@itwin/core-quantity'
       - '@itwin/imodel-components-react'
       - '@itwin/presentation-common'
+      - '@itwin/presentation-components'
       - '@itwin/webgl-compatibility'
       - encoding
       - eslint-import-resolver-webpack
+      - micro-memoize
       - react-dom
       - react-native
       - react-redux
@@ -16873,7 +16905,7 @@ packages:
     dev: false
 
   file:projects/simple-host.tgz_044db467d2b7b94719e5def06496f745:
-    resolution: {integrity: sha512-yJOwuKKXW5AsR8nJw4mi0m89Q1qOgMIC6MSrdpvzXcfy+lmiqC4+D3kHpEk9BPu7M2/2+MQvOLsk4iO03qV/CA==, tarball: file:projects/simple-host.tgz}
+    resolution: {integrity: sha512-DdX1Nqixno5GT9rBO5zNUGvNIWQjzCfJTVu6Ro2DgiSiuY8vYIasRK+c84hjhB+eGgt89JItRbjuF00XH2E5qg==, tarball: file:projects/simple-host.tgz}
     id: file:projects/simple-host.tgz
     name: '@rush-temp/simple-host'
     version: 0.0.0

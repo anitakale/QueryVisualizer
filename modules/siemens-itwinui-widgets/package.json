@@ -1,6 +1,6 @@
 {
   "name": "@bentley/siemens-itwinui-widgets",
-  "version": "3.2.11",
+  "version": "3.2.12",
   "private": false,
   "main": "lib/index.js",
   "peerDependencies": {
@@ -14,9 +14,9 @@
     "@itwin/appui-react": "~3.2.8"
   },
   "dependencies": {
-    "@bentley/spg-external-data-providers": "3.2.11",
+    "@bentley/spg-external-data-providers": "3.2.12",
     "react": "^17.0.2",
-    "@bentley/isv-common-utilities": "3.2.11"
+    "@bentley/isv-common-utilities": "3.2.12"
   },
   "scripts": {
     "clean": "rimraf lib .rush/temp/package-deps*.json *.build.log",
