@@ -28,7 +28,7 @@ export const QueryEditor = (props: QueryEditorProps) => {
   const dialogPosition = DialogStateCache.getPosition();
   const [isDialogOpened, setIsDialogOpened] = useState(props.opened);
   const XHQ_VIEWS_DIALOG_ID = "query-views-dialog";
-  const [querytext, setQueryText] = React.useState("");
+  const [querytext, setQueryText] = React.useState("SELECT EcInstanceId, strftime('%Y-%m-%d',LastMod) From ProcessFunctional.NAMED_ITEM item");
 
   React.useEffect(() => {
     return function cleanup() {
