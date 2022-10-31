@@ -3,13 +3,16 @@ import { Dialog, DialogAlignment } from "@itwin/core-react";
 import React, { ChangeEvent, useState } from "react";
 import { DialogStateCache } from "../XhqViewsDialog/DialogCache/DialogStateCache";
 import { Logger } from "@itwin/core-bentley";
-import { ModelessDialog, useActiveViewport } from "@itwin/appui-react";
+import { MessageManager, ModelessDialog, useActiveViewport } from "@itwin/appui-react";
 import { XhqViewsManager } from "../XhqViewsManager";
 import { IXhqOptions } from "../XhqViewsDialog/interfaces";
 import { Button, Label, Input, Textarea } from "@itwin/itwinui-react";
-import { EmphasizeElements, IModelApp, Viewport, ViewPose } from "@itwin/core-frontend";
-import { ColorDef, FeatureOverrideType } from "@itwin/core-common";
-
+import { EmphasizeElements, IModelApp, NotifyMessageDetails, OutputMessageAlert, OutputMessagePriority, OutputMessageType, Viewport, ViewPose } from "@itwin/core-frontend";
+import { ColorDef, FeatureOverrideType, HSVColor, QueryRowFormat } from "@itwin/core-common";
+import { CustomTableNodeTreeComponent } from "./CustomTableNodeTreeComponent";
+import "./CustomTableNodeTree.scss";
+import "./QueryEditor.scss";
+import { stringify } from "querystring";
 
 interface IPopupLocationTuple {
   xLocation: number;
@@ -19,7 +22,7 @@ interface IPopupLocationTuple {
 export interface QueryEditorProps {
   opened: boolean;
   onClose?: Function;
-  XhqOptions : IXhqOptions;
+  XhqOptions: IXhqOptions;
 }
 
 export const QueryEditor = (props: QueryEditorProps) => {
@@ -28,7 +31,12 @@ export const QueryEditor = (props: QueryEditorProps) => {
   const dialogPosition = DialogStateCache.getPosition();
   const [isDialogOpened, setIsDialogOpened] = useState(props.opened);
   const XHQ_VIEWS_DIALOG_ID = "query-views-dialog";
-  const [querytext, setQueryText] = React.useState("SELECT EcInstanceId, strftime('%Y-%m-%d',LastMod) From ProcessFunctional.NAMED_ITEM item");
+  // queryText contains the content of the Text area of the ecsql query.
+  const [querytext, setQueryText] = React.useState("SELECT rel.SourceEcInstanceId EcInstanceId, strftime('%Y-%m-%d',LastMod) Condition From ProcessFunctional.NAMED_ITEM item, Biscore.ElementRefersToElements rel WHERE item.EcInstanceId = rel.TargetEcInstanceId");
+  // queryResults contains the full result of the query as is.
+  const [queryResults, setQueryResults] = React.useState<any>([]);
+  // Contains the condition mapped to color and an array of element ids (= ecinstance ids)
+  const [colorMap, setColorMap] = React.useState<Map<string|undefined, {color: ColorDef, elements: string[]}>>(new Map());
 
   React.useEffect(() => {
     return function cleanup() {
@@ -42,9 +50,16 @@ export const QueryEditor = (props: QueryEditorProps) => {
       DialogStateCache.storePosition(_xhqViewsDialogRef?.state);
     }
     if (props.onClose) props.onClose();
-        Logger.logInfo(
-        XhqViewsManager.loggerCategory(this),
-        `Modeless External views Dialog closed`
+    if (viewport) {
+      // Restore to the viewport to the default colors.
+      const emph = EmphasizeElements.getOrCreate(viewport);
+      emph.clearEmphasizedElements(viewport);
+      emph.clearIsolatedElements(viewport);
+      emph.clearOverriddenElements(viewport);
+    }
+    Logger.logInfo(
+      XhqViewsManager.loggerCategory(this),
+      `Modeless External views Dialog closed`
     );
   };
 
@@ -52,11 +67,11 @@ export const QueryEditor = (props: QueryEditorProps) => {
     DialogStateCache.storePosition(_xhqViewsDialogRef?.state);
   };
 
-   const _setDialogState = (openState: boolean) => {
+  const _setDialogState = (openState: boolean) => {
     setIsDialogOpened(openState);
   };
 
-   const _getDialogRef = (): React.ReactNode => {
+  const _getDialogRef = (): React.ReactNode => {
     return _xhqViewsDialogRef?.props.children;
   };
 
@@ -123,40 +138,111 @@ export const QueryEditor = (props: QueryEditorProps) => {
     ? dialogPosition.yPosition
     : xLocationAndAlignemntComputed.yLocation;
 
-    const runQuery = async (_event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-        if (!viewport)
-            return;
-        try {
-            const query = querytext;
-            const elementsAsync = viewport.iModel.query(query);
-            const elements: string[] = [];
-            for await (const element of elementsAsync) {
-              elements.push(element[0]);
-            }
-            const emph = EmphasizeElements.getOrCreate(viewport);
-            emph.clearEmphasizedElements(viewport);
-            emph.clearOverriddenElements(viewport);
-            emph.overrideElements(elements, viewport, ColorDef.from(255,0,0,0),  FeatureOverrideType.ColorOnly, true);
-            emph.wantEmphasis = true;
-            emph.emphasizeElements(elements, viewport);
-            /* All elements that are not overridden are outside the box by default. So to color them we don't need to have elements ids.
-            This is done so we would not need to query large amount of elements that are outside the box */
-            // EmphasizeElements.;
+  const runQuery = async (_event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    if (!viewport) 
+      return; // if there is no valid viewport there is no point to continue.
+    try {
+      const query = querytext;
+      // Run the query and request specific format of result. 
+      // Maybe there is a better way, more efficient way to know what column is Condition or EcInstanceId
+      // instead of full descriptive json objects. (see rowFormat options)
+      const elementsAsync = viewport.iModel.query(query, undefined,
+        {
+          includeMetaData: true,
+          convertClassIdsToClassNames: false,
+          rowFormat: QueryRowFormat.UseECSqlPropertyNames
+        });
+      const elements: any[] = [];
+      for await (const element of elementsAsync) {
+        // unsure how to check if query contains EcInstanceId column and Condition column.
+        // If for some reason the values are null for an object the property is not defined in json object, 
+        // if(element.EcInstanceId === null || element.EcInstanceId === undefined)
+        //  throw "EcInstanceId is not defined in query as a column name.";
+        elements.push(element);
+      }
+      // Set the results, so if we want to have an additional effect to display the results
+      // We can do so, for example to update the chart.
+      setQueryResults(elements);
+
+      // Generate a colormap based on the results.
+      const colormap: Map<string|undefined, {color: ColorDef, elements: string[]}> = new Map();
+      for (const element of elements) {
+        // Check if ecinstanceid is valid else skip the result.
+        // This can happen with a query that provides 3d ids and null 3d ids if not aggregated.
+        // See example mail. 
+        if(element.EcInstanceId === undefined || element.EcInstanceId === null)
+          continue;
+        if(colormap.has(element.Condition)) {
+          colormap.get(element.Condition)?.elements.push(element.EcInstanceId);
         }
-        catch {
-           
+        else {
+          colormap.set(element.Condition, {
+            color: ColorDef.fromHSV(
+                new HSVColor(randomInt(0,360), randomInt(60,100), 100)),
+            elements: []
+          });
+          colormap.get(element.Condition)?.elements.push(element.EcInstanceId);
         }
-    };
+      }
+      // Setting the new color map. An effect could be created to update the legend accoridingly.
+      // Legen is basicly iterating over the key values and display value.color
+      setColorMap(colormap);
+    }
+    catch (_error) {
+      // Not sure if we should log somehow the full stack trace.
+      // What is the best practice here ?
+      // process.stdout.write(JSON.stringify(JSON.stringify(_error)));
+      if (_error instanceof Error) {
+        MessageManager.addToMessageCenter(
+          new NotifyMessageDetails(OutputMessagePriority.Error, _error.message, undefined, OutputMessageType.Alert, OutputMessageAlert.Dialog)
+        );
+      }
+    }
+  };
+
+  // Helper funcvtion for generating random colors.
+  const randomInt = (min: number, max: number)  => { 
+    return Math.floor(Math.random() * (max - min + 1) + min)
+  }
+
+  const applyQueryResults = async (_event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    if (!viewport)
+      return;
+    try {
+
+      const emph = EmphasizeElements.getOrCreate(viewport);
+      emph.clearEmphasizedElements(viewport);
+      emph.clearOverriddenElements(viewport);
+      colorMap.forEach((value: {color: ColorDef, elements: string[]}, _key: string|undefined) => {
+        emph.overrideElements(value.elements, viewport, value.color, FeatureOverrideType.ColorOnly, true);
+        emph.emphasizeElements(value.elements, viewport);
+      });
+      emph.wantEmphasis = true;
       
-  const  handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-      setQueryText(event.target.value)
-  }  
+      /* All elements that are not overridden are outside the box by default. So to color them we don't need to have elements ids.
+      This is done so we would not need to query large amount of elements that are outside the box */
+      // EmphasizeElements.;
+    }
+    catch (_error) {
+      // process.stdout.write(JSON.stringify(JSON.stringify(_error)));
+      if (_error instanceof Error) {
+        MessageManager.addToMessageCenter(
+          new NotifyMessageDetails(OutputMessagePriority.Error, _error.message, undefined, OutputMessageType.Alert)
+
+        );
+      }
+    }
+  };
+
+  const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setQueryText(event.target.value)
+  }
 
 
   return (
     <ModelessDialog
       id="queryeditor-dialog"
-      title= {XhqViewsManager.translate("Query Vizualiser")}
+      title={XhqViewsManager.translate("Query Vizualiser")}
       opened={isDialogOpened}
       resizable={true}
       movable={true}
@@ -178,19 +264,21 @@ export const QueryEditor = (props: QueryEditorProps) => {
         <Label htmlFor="text-input">
           Query
         </Label>
-        <Textarea placeholder="Enter Quey to run"  onChange={handleChange} />,
+        <Textarea placeholder="Enter Quey to run" onChange={handleChange} value={querytext} />,
 
       </div>
       <Button styleType="high-visibility" onClick={runQuery}>
-          {XhqViewsManager.translate("Run")}
+        {XhqViewsManager.translate("Generate")}
       </Button>
       <Label htmlFor="text-input">
-          Legend
-        </Label>
-        <div>
-          This is area where we show all unique results and map to color.
-          Some more needs to be done.
-        </div>
+        Legend
+      </Label>
+      <div className="legend-container">
+        <CustomTableNodeTreeComponent />
+      </div>
+      <Button styleType="high-visibility" onClick={applyQueryResults}>
+        {XhqViewsManager.translate("Apply")}
+      </Button>
     </ModelessDialog>
   );
 };
