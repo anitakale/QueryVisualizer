@@ -184,6 +184,13 @@ export const QueryEditor = (props: QueryEditorProps) => {
       <Button styleType="high-visibility" onClick={runQuery}>
           {XhqViewsManager.translate("Run")}
       </Button>
+      <Label htmlFor="text-input">
+          Legend
+        </Label>
+        <div>
+          This is area where we show all unique results and map to color.
+          Some more needs to be done.
+        </div>
     </ModelessDialog>
   );
 };
