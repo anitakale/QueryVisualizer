@@ -44,7 +44,8 @@
     "@itwin/tree-widget-react": "^0.4.7",
     "@bentley/siemens-itwinui-widgets": "3.2.12",
     "@bentley/itwin-markup-frontstage": "2.14.5",
-    "@svgr/webpack": "^5.5.0"
+    "@svgr/webpack": "^5.5.0",
+    "@itwin/presentation-components": "~3.2.8"
   },
   "scripts": {
     "start": "react-scripts --max_old_space_size=4096 start",
