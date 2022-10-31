@@ -27,6 +27,7 @@
     "clean": "rimraf lib .rush/temp/package-deps*.json *.build.log",
     "watch": "tsc -w --incremental --listEmittedFiles",
     "build": "tsc && npm run bundle",
+    "build:watch": "tsc -w --incremental --listEmittedFiles && npm run bundle",
     "bundle": "cpx \"public/**/**\" lib/public && cpx \"src/**/*.*scss\" lib && cpx \"src/**/*.svg\" lib && cpx \"src/**/*.json\" lib",
     "startOld": "npm run pseudolocalize && react-scripts --max_old_space_size=8192 start",
     "buildOld": "npm run pseudolocalize && react-scripts --max_old_space_size=8192 build",

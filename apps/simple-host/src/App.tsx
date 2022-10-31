@@ -14,7 +14,8 @@ import {
   Viewer,
   ViewerContentToolsProvider,
   ViewerNavigationToolsProvider,
-  ViewerPerformance
+  ViewerPerformance,
+  ViewerStatusbarItemsProvider
 } from "@itwin/web-viewer-react";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { history } from "./history";
@@ -196,6 +197,16 @@ const App: React.FC = () => {
             vertical: {
               measureGroup: false,
             },
+          }),
+          new ViewerStatusbarItemsProvider({
+            accuSnapModePicker: true,
+            messageCenter: true,
+            postToolAssistanceSeparator: true,
+            preToolAssistanceSeparator: true,
+            selectionInfo: true,
+            selectionScope: true,
+            tileLoadIndicator: false, // was not working consistently so we added TileLoadingUiItemsProvider directly below
+            toolAssistance: true
           }),
           new DisplayStylesWidgetProvider(), 
           new CustomNodeLoadingTreeWidgetProvider()

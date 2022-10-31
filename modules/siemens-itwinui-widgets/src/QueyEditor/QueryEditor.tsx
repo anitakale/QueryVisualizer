@@ -28,7 +28,7 @@ export const QueryEditor = (props: QueryEditorProps) => {
   const dialogPosition = DialogStateCache.getPosition();
   const [isDialogOpened, setIsDialogOpened] = useState(props.opened);
   const XHQ_VIEWS_DIALOG_ID = "query-views-dialog";
-  const [querytext, setQueryText] = React.useState("");
+  const [querytext, setQueryText] = React.useState("SELECT EcInstanceId, strftime('%Y-%m-%d',LastMod) From ProcessFunctional.NAMED_ITEM item");
 
   React.useEffect(() => {
     return function cleanup() {
@@ -184,6 +184,13 @@ export const QueryEditor = (props: QueryEditorProps) => {
       <Button styleType="high-visibility" onClick={runQuery}>
           {XhqViewsManager.translate("Run")}
       </Button>
+      <Label htmlFor="text-input">
+          Legend
+        </Label>
+        <div>
+          This is area where we show all unique results and map to color.
+          Some more needs to be done.
+        </div>
     </ModelessDialog>
   );
 };
