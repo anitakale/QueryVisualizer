@@ -11,7 +11,12 @@
     "@itwin/presentation-frontend": "^3.2.8",
     "@itwin/core-react": "~3.2.8",
     "@itwin/core-i18n": "~3.2.8",
-    "@itwin/appui-react": "~3.2.8"
+    "@itwin/appui-react": "~3.2.8",
+    "@itwin/core-common": "~3.2.8",
+    "@itwin/presentation-components": "~3.2.8",
+    "@itwin/presentation-common": "~3.2.8",
+    "@itwin/components-react": "~3.2.8",
+    "@itwin/itwinui-icons-react": "~1.16.0"    
   },
   "dependencies": {
     "@bentley/spg-external-data-providers": "3.2.12",

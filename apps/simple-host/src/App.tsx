@@ -23,7 +23,7 @@ import { PropertyGridManager, PropertyGridUiItemsProvider } from "@itwin/propert
 import { TreeWidget } from "@itwin/tree-widget-react";
 import { AppUIProvider } from "./UIProviders/AppUIProvider";
 import { SiemensSampleAppReducer } from "./Store/SiemensSampleAppStore";
-import { XhqViewsManager } from "@bentley/siemens-itwinui-widgets";
+import { XhqViewsManager, DisplayStylesWidgetProvider, CustomNodeLoadingTreeWidgetProvider } from "@bentley/siemens-itwinui-widgets";
 import { ITwinLocalization } from "@itwin/core-i18n";
 
 const App: React.FC = () => {
@@ -76,10 +76,10 @@ const App: React.FC = () => {
   const login = useCallback(async () => {
     try {
       await publicAuthClient.signIn();
-      await privateAuthClient.signIn();
+      // await privateAuthClient.signIn();
     } catch {
       await publicAuthClient.signOut();
-      await privateAuthClient.signOut();
+      // await privateAuthClient.signOut();
     }
   }, [privateAuthClient,publicAuthClient]);
 
@@ -197,6 +197,8 @@ const App: React.FC = () => {
               measureGroup: false,
             },
           }),
+          new DisplayStylesWidgetProvider(), 
+          new CustomNodeLoadingTreeWidgetProvider()
         ]}
         backend={{ hostedBackend: undefined }}
       />

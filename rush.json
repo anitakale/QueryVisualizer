@@ -476,14 +476,12 @@
     {
       "packageName": "simple-host",
       "projectFolder": "apps/simple-host",
-      "reviewCategory": "production",
       "shouldPublish": false  
     },
     {
       "packageName": "@bentley/siemens-itwinui-widgets",
       "projectFolder": "modules/siemens-itwinui-widgets",
-      "reviewCategory": "production",
-      "shouldPublish": true
+      "shouldPublish": false
     } 
   ]
 }

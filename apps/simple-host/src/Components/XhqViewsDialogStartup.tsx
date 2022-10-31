@@ -1,6 +1,6 @@
 // Copyright (c) Bentley Systems
 import * as React from "react";
-import { IXhqOptions, XhqViewsModelessDialog } from "@bentley/siemens-itwinui-widgets";
+import { IXhqOptions, XhqViewsModelessDialog, QueryEditor } from "@bentley/siemens-itwinui-widgets";
 import { ModelessDialogManager, StateManager } from "@itwin/appui-react";
 import { AppUIProvider } from "../UIProviders/AppUIProvider";
 import { SiemensSampleAppActions } from "../Store/SiemensSampleAppStore";
@@ -16,7 +16,7 @@ export class XhqViewsDialogStartup {
     }
 
     return (
-      <XhqViewsModelessDialog
+      <QueryEditor
         opened={true}
         onClose={closeEvent}
         XhqOptions={{
