@@ -205,11 +205,10 @@ const App: React.FC = () => {
             preToolAssistanceSeparator: true,
             selectionInfo: true,
             selectionScope: true,
-            tileLoadIndicator: false, // was not working consistently so we added TileLoadingUiItemsProvider directly below
+            tileLoadIndicator: true,
             toolAssistance: true
           }),
-          new DisplayStylesWidgetProvider(), 
-          new CustomNodeLoadingTreeWidgetProvider()
+          new DisplayStylesWidgetProvider()
         ]}
         backend={{ hostedBackend: undefined }}
       />

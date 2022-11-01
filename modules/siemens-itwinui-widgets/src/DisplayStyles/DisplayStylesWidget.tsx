@@ -11,7 +11,7 @@ import DisplayStylesApp from "./DisplayStylesApi";
 import { displayStyles } from "./Styles";
 
 const CUSTOM_STYLE_INDEX = 0;
-const DEFAULT_STYLE_INDEX = 4;
+const DEFAULT_STYLE_INDEX = 1; // change to default style for display. Color pops out more.
 
 export const DisplayStylesWidget = () => {
   const viewport = useActiveViewport();
@@ -49,9 +49,6 @@ export const DisplayStylesWidget = () => {
         <LabeledSelect label="Select Style:" size="small" displayStyle="inline" value={activePresetIndex} onChange={setActivePresetIndex} options={options} style={{ width: "auto" }} />
         <ToggleSwitch label={infoLabel} checked={mergeState} onChange={(event) => setMergeState(event.target.checked)} />
       </div>
-      <Alert type="informational" className="instructions">
-        Use the drop down to change the display style. Edit the "Custom" style in "Style.ts" and re-run the sample to see the changes.
-      </Alert>
     </div>
   );
 };
