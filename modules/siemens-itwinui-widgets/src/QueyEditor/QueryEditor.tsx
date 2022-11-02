@@ -1,6 +1,6 @@
 // Copyright (c) Bentley Systems
 import { Dialog, DialogAlignment } from "@itwin/core-react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { DialogStateCache } from "../XhqViewsDialog/DialogCache/DialogStateCache";
 import { Logger } from "@itwin/core-bentley";
 import {
@@ -72,6 +72,10 @@ export const QueryEditor = (props: QueryEditorProps) => {
   const [colorMap, setColorMap] = React.useState<
     Map<string | undefined, { color: ColorDef; elements: string[] }>
   >(new Map());
+
+  // toolbar states
+  const [useEmphasize, setUseEmphasize] = useState(true);
+  const [useIsolate, setUseIsolate] = useState(false);
 
   const BAR_CHART_DATA: IData[] = [];
 
@@ -218,6 +222,7 @@ export const QueryEditor = (props: QueryEditorProps) => {
         // See example mail.
         if (element.EcInstanceId === undefined || element.EcInstanceId === null)
           continue;
+        
         if (colormap.has(element.Condition)) {
           colormap.get(element.Condition)?.elements.push(element.EcInstanceId);
         } else {
@@ -230,6 +235,16 @@ export const QueryEditor = (props: QueryEditorProps) => {
           colormap.get(element.Condition)?.elements.push(element.EcInstanceId);
         }
       }
+      /*
+      if(colormap.has("undefined")) {
+        const elm = colormap.get("undefined");
+        elm!.color = ColorDef.from(200,200,200);
+      }
+      if(colormap.has("null")) {
+        const elm = colormap.get("null");
+        elm!.color = ColorDef.from(200,200,200);
+      }
+      */
       // Setting the new color map. An effect could be created to update the legend accoridingly.
       // Legen is basicly iterating over the key values and display value.color
       setColorMap(colormap);
@@ -279,6 +294,7 @@ export const QueryEditor = (props: QueryEditorProps) => {
             replace
           );
           emph.emphasizeElements(value.elements, viewport, undefined, replace);
+          replace = false;
         }
       );
       emph.wantEmphasis = true;
@@ -342,6 +358,85 @@ export const QueryEditor = (props: QueryEditorProps) => {
     }
   };
 
+
+  const toggleEmphasize = async () => { 
+    if (!viewport) return;
+    try {
+      const emph = EmphasizeElements.getOrCreate(viewport);
+      emph.clearEmphasizedElements(viewport);
+      if(!useEmphasize) {
+        let replace = true;
+        colorMap.forEach(
+          (
+            value: { color: ColorDef; elements: string[] },
+            _key: string | undefined
+          ) => {
+            emph.emphasizeElements(value.elements, viewport, undefined, replace);
+            replace = false;
+          }
+        );
+      }
+      emph.wantEmphasis = useEmphasize;
+      setUseEmphasize(!useEmphasize);
+
+      /* All elements that are not overridden are outside the box by default. So to color them we don't need to have elements ids.
+      This is done so we would not need to query large amount of elements that are outside the box */
+      // EmphasizeElements.;
+    } catch (_error) {
+      // process.stdout.write(JSON.stringify(JSON.stringify(_error)));
+      if (_error instanceof Error) {
+        MessageManager.addToMessageCenter(
+          new NotifyMessageDetails(
+            OutputMessagePriority.Error,
+            _error.message,
+            undefined,
+            OutputMessageType.Alert
+          )
+        );
+      }
+    }
+  }
+
+  const toggleIsolate = async () => { 
+    if (!viewport) return;
+    try {
+      const emph = EmphasizeElements.getOrCreate(viewport);
+      emph.clearIsolatedElements(viewport);
+      if(!useIsolate) {
+        let replace = true;
+        colorMap.forEach(
+          (
+            value: { color: ColorDef; elements: string[] },
+            _key: string | undefined
+          ) => {
+            emph.isolateElements(value.elements, viewport, replace);
+            replace = false;
+          }
+        );
+        setUseEmphasize(false);
+      }
+      setUseIsolate(!useIsolate);
+
+      /* All elements that are not overridden are outside the box by default. So to color them we don't need to have elements ids.
+      This is done so we would not need to query large amount of elements that are outside the box */
+      // EmphasizeElements.;
+    } catch (_error) {
+      // process.stdout.write(JSON.stringify(JSON.stringify(_error)));
+      if (_error instanceof Error) {
+        MessageManager.addToMessageCenter(
+          new NotifyMessageDetails(
+            OutputMessagePriority.Error,
+            _error.message,
+            undefined,
+            OutputMessageType.Alert
+          )
+        );
+      }
+    }
+  }
+ 
+
+
   return (
     <ModelessDialog
       id="queryeditor-dialog"
@@ -399,7 +494,12 @@ export const QueryEditor = (props: QueryEditorProps) => {
       <Button styleType="high-visibility" onClick={runQuery}>
         {XhqViewsManager.translate("Generate")}
       </Button>
-      <QueryEditorToolbar />
+      <QueryEditorToolbar 
+        onEmphasize={toggleEmphasize} 
+        isEmphasize={useEmphasize}
+        onIsolate={toggleIsolate}
+        isIsolate={useIsolate}
+      />
       <Label htmlFor="text-input">
         Legend
       </Label>

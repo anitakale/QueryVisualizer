@@ -1,26 +1,19 @@
 import React from "react";
 import { } from "@itwin/itwinui-icons"
 import { IconButton } from "@itwin/itwinui-react";
-import { SvgIsolate, SvgVisibilityShow } from "@itwin/itwinui-icons-react";
+import { SvgEyedropperFilled, SvgIsolate, SvgVisibilityEmphasize, SvgVisibilityHalf, SvgVisibilityHide, SvgVisibilityShow } from "@itwin/itwinui-icons-react";
 
-export const QueryEditorToolbar = () => {
+export interface QueryEditorToolbarProps {
+    onIsolate?: () => any;
+    onShowAll?: () => any;
+    onHideAll?: () => any;
+    onInvert?: () => any;
+    onEmphasize: () => any;
+    isEmphasize: boolean;
+    isIsolate: boolean;
+} 
 
-
-    const onIsolate = () => {
-
-    };
-
-    const onShowAll = () => {
-
-    };
-
-    const onHideAll = () => {
-
-    };
-
-    const onInvert = () => {
-
-    };
+export const QueryEditorToolbar = (props: QueryEditorToolbarProps) => {
 
     // Information about icons:
     // see https://itwin.github.io/iTwinUI-icons/
@@ -33,16 +26,17 @@ export const QueryEditorToolbar = () => {
             <IconButton
                 className={"mybutton-toolbar"}
                 title={"Isolate"}
-                onClick={onIsolate}
+                onClick={props.onIsolate}
                 styleType="borderless"
                 size="small"
+                isActive={props.isIsolate}
             >
                 <SvgIsolate />
             </IconButton>
             <IconButton
                 className={"mybutton-toolbar"}
                 title={"Show All"}
-                onClick={onShowAll}
+                onClick={props.onShowAll}
                 styleType="borderless"
                 size="small"
             >
@@ -51,20 +45,30 @@ export const QueryEditorToolbar = () => {
             <IconButton
                 className={"mybutton-toolbar"}
                 title={"Hide All"}
-                onClick={onHideAll}
+                onClick={props.onHideAll}
                 styleType="borderless"
                 size="small"
             >
-                <SvgVisibilityShow />
+                <SvgVisibilityHide />
             </IconButton>
             <IconButton
                 className={"mybutton-toolbar"}
                 title={"Invert"}
-                onClick={onInvert}
+                onClick={props.onInvert}
                 styleType="borderless"
                 size="small"
             >
-                <SvgVisibilityShow />
+                <SvgVisibilityHalf />
+            </IconButton>
+            <IconButton
+                className={"mybutton-toolbar"}
+                title={"Emphasize"}
+                onClick={props.onEmphasize}
+                isActive={props.isEmphasize}
+                styleType="borderless"
+                size="small"
+            >
+                <SvgVisibilityEmphasize />
             </IconButton>
         </div>
         </>
