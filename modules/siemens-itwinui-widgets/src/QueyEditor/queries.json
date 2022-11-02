@@ -16,11 +16,11 @@
         "label": "Smoke Detectors"
     },
     {
-        "value": "SELECT EcInstanceID EcInstanceId, ec_classname(EcClassId,'c') Codition, ec_classname(EcClassId,'s') SchemaName FROM BisCore.GeometricElement3d",
-        "label": "Get classes"
-    },
-    {
         "value": "SELECT rel.SourceEcInstanceId EcInstanceId, strftime('%Y-%m-%d',LastMod) Condition From ProcessFunctional.NAMED_ITEM item, Biscore.ElementRefersToElements rel WHERE item.EcInstanceId = rel.TargetEcInstanceId",
         "label": "last modified date"
+    },
+    {
+        "value": "SELECT EcInstanceID EcInstanceId, ec_classname(EcClassId,'c') Condition, ec_classname(EcClassId,'s') as schemaname FROM BisCore.GeometricElement3d",
+        "label": "Chart Query"
     }
 ]
