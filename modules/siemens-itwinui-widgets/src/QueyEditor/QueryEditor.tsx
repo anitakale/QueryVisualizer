@@ -1,6 +1,6 @@
 // Copyright (c) Bentley Systems
 import { Dialog, DialogAlignment } from "@itwin/core-react";
-import React, { ChangeEvent, useState } from "react";
+import React, { useState } from "react";
 import { DialogStateCache } from "../XhqViewsDialog/DialogCache/DialogStateCache";
 import { Logger } from "@itwin/core-bentley";
 import {
@@ -23,7 +23,6 @@ import {
 } from "@itwin/core-frontend";
 import {
   ColorDef,
-  FeatureAppearance,
   FeatureOverrideType,
   HSVColor,
   QueryRowFormat,
@@ -36,6 +35,7 @@ import type { IData, IGroupedData } from "../BarChartDisplay/types";
 import { BarChart } from "../BarChartDisplay/BarChart";
 import { ToggleSwitch } from "@itwin/itwinui-react";
 import { AnyAaaaRecord } from "dns";
+import Queries from "./queries.json";
 
 interface IPopupLocationTuple {
   xLocation: number;
@@ -49,6 +49,7 @@ export interface QueryEditorProps {
 }
 
 export const QueryEditor = (props: QueryEditorProps) => {
+  const [selectedValue, setSelectedValue] = useState<string>("");
   const viewport = useActiveViewport();
   let _xhqViewsDialogRef: Dialog | undefined;
   const dialogPosition = DialogStateCache.getPosition();
@@ -101,9 +102,9 @@ export const QueryEditor = (props: QueryEditorProps) => {
     DialogStateCache.storePosition(_xhqViewsDialogRef?.state);
   };
 
-  const _setDialogState = (openState: boolean) => {
-    setIsDialogOpened(openState);
-  };
+  // const _setDialogState = (openState: boolean) => {
+  //   setIsDialogOpened(openState);
+  // };
 
   const _getDialogRef = (): React.ReactNode => {
     return _xhqViewsDialogRef?.props.children;
@@ -270,9 +271,6 @@ export const QueryEditor = (props: QueryEditorProps) => {
             replace
           );
           emph.emphasizeElements(value.elements, viewport, undefined, replace);
-          // This is a line to enable isolation. Will be needed for restrooms demo.
-          // emph.isolateElements(value.elements, viewport, replace);
-          replace = false;
         }
       );
       emph.wantEmphasis = true;
@@ -358,6 +356,30 @@ export const QueryEditor = (props: QueryEditorProps) => {
       dialogId={XHQ_VIEWS_DIALOG_ID}
     >
       <div className="QueryEditor-dialog-container">
+        <Label htmlFor="text-input">Select Queries: </Label>
+        <select
+          className="select-queries-label"
+          onChange={(value) => {
+            setSelectedValue(value.currentTarget.innerText);
+            setQueryText(value.currentTarget.value);
+          }}
+        >
+          <option></option>
+          {Queries.map(
+            (item: {
+              value: string | number | readonly string[] | undefined;
+              label:
+                | boolean
+                | React.ReactChild
+                | React.ReactFragment
+                | React.ReactPortal
+                | null
+                | undefined;
+            }) => (
+              <option value={item.value}>{item.label}</option>
+            )
+          )}
+        </select>
         <Label htmlFor="text-input">Query</Label>
         <Textarea
           placeholder="Enter Quey to run"
@@ -373,6 +395,9 @@ export const QueryEditor = (props: QueryEditorProps) => {
       <div className="legend-container">
         <CustomTableNodeTreeComponent />
       </div>
+      <Button styleType="high-visibility">
+        {XhqViewsManager.translate("Save")}
+      </Button>
       <Button styleType="high-visibility" onClick={applyQueryResults}>
         {XhqViewsManager.translate("Apply")}
       </Button>
