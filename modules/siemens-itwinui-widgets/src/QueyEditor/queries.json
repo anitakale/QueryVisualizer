@@ -1,0 +1,14 @@
+[
+    {
+        "value": "select * from ProcessPhysical.NAMED_ITEM",
+        "label": "Named Item"
+    },
+    {
+        "value": "select * from ProcessPhysical.GATE_VALVE",
+        "label": "Gate Value"
+    },
+    {
+        "value": "select * from ProcessPhysical.PUMP",
+        "label": "Pump"
+    }
+]
