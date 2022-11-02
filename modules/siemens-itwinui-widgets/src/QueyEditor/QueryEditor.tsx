@@ -8,7 +8,7 @@ import { XhqViewsManager } from "../XhqViewsManager";
 import { IXhqOptions } from "../XhqViewsDialog/interfaces";
 import { Button, Label, Input, Textarea } from "@itwin/itwinui-react";
 import { EmphasizeElements, IModelApp, NotifyMessageDetails, OutputMessageAlert, OutputMessagePriority, OutputMessageType, Viewport, ViewPose } from "@itwin/core-frontend";
-import { ColorDef, FeatureOverrideType, HSVColor, QueryRowFormat } from "@itwin/core-common";
+import { ColorDef, FeatureAppearance, FeatureOverrideType, HSVColor, QueryRowFormat } from "@itwin/core-common";
 import { CustomTableNodeTreeComponent } from "./CustomTableNodeTreeComponent";
 import "./CustomTableNodeTree.scss";
 import "./QueryEditor.scss";
@@ -213,11 +213,17 @@ export const QueryEditor = (props: QueryEditorProps) => {
       const emph = EmphasizeElements.getOrCreate(viewport);
       emph.clearEmphasizedElements(viewport);
       emph.clearOverriddenElements(viewport);
+      emph.clearIsolatedElements(viewport);
+      let replace = true;
       colorMap.forEach((value: {color: ColorDef, elements: string[]}, _key: string|undefined) => {
-        emph.overrideElements(value.elements, viewport, value.color, FeatureOverrideType.ColorOnly, true);
-        emph.emphasizeElements(value.elements, viewport);
+        emph.overrideElements(value.elements, viewport, value.color, FeatureOverrideType.ColorOnly, replace);
+        emph.emphasizeElements(value.elements, viewport, undefined, replace);
+        // This is a line to enable isolation. Will be needed for restrooms demo.
+        // emph.isolateElements(value.elements, viewport, replace);
+        replace = false;
       });
       emph.wantEmphasis = true;
+
       
       /* All elements that are not overridden are outside the box by default. So to color them we don't need to have elements ids.
       This is done so we would not need to query large amount of elements that are outside the box */
