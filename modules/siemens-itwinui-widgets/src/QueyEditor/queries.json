@@ -10,5 +10,9 @@
     {
         "value": "select * from ProcessPhysical.PUMP",
         "label": "Pump"
+    },
+    {
+        "value": "SELECT EcInstanceID EcInstanceId, ec_classname(EcClassId,'c') Condition, ec_classname(EcClassId,'s') as schemaname FROM BisCore.GeometricElement3d",
+        "label": "Chart Query"
     }
 ]
