@@ -23,6 +23,7 @@ import {
 } from "@itwin/core-frontend";
 import {
   ColorDef,
+  FeatureAppearance,
   FeatureOverrideType,
   HSVColor,
   QueryRowFormat,
@@ -33,7 +34,7 @@ import "./QueryEditor.scss";
 import { stringify } from "querystring";
 import type { IData, IGroupedData } from "../BarChartDisplay/types";
 import { BarChart } from "../BarChartDisplay/BarChart";
-import { ToggleSwitch, ToggleSwitchProps } from "@itwin/itwinui-react";
+import { ToggleSwitch } from "@itwin/itwinui-react";
 import { AnyAaaaRecord } from "dns";
 
 interface IPopupLocationTuple {
@@ -254,6 +255,8 @@ export const QueryEditor = (props: QueryEditorProps) => {
       const emph = EmphasizeElements.getOrCreate(viewport);
       emph.clearEmphasizedElements(viewport);
       emph.clearOverriddenElements(viewport);
+      emph.clearIsolatedElements(viewport);
+      let replace = true;
       colorMap.forEach(
         (
           value: { color: ColorDef; elements: string[] },
@@ -264,9 +267,12 @@ export const QueryEditor = (props: QueryEditorProps) => {
             viewport,
             value.color,
             FeatureOverrideType.ColorOnly,
-            true
+            replace
           );
-          emph.emphasizeElements(value.elements, viewport);
+          emph.emphasizeElements(value.elements, viewport, undefined, replace);
+          // This is a line to enable isolation. Will be needed for restrooms demo.
+          // emph.isolateElements(value.elements, viewport, replace);
+          replace = false;
         }
       );
       emph.wantEmphasis = true;

@@ -10,6 +10,20 @@
             "name": "Launch Chrome against localhost",
             "url": "http://localhost:3000/?projectId=e2d5af89-f469-4490-a17a-9c1ac5807a7b&changesetId=ebab9c84a3ac96b632b07a67899ab1cd674b2b09&imodelId=0fb98067-181f-497c-8335-340e6257faa2&xhqbaseurl=https://en.wikipedia.org/&hideXhqNavbar=1",
             "webRoot": "${workspaceFolder}"
+        },
+        {
+            "type": "chrome",
+            "request": "launch",
+            "name": "Stabilizer",
+            "url": "http://localhost:3000/?projectId=0b20f355-8c4b-408b-b094-e9ee0200f1e5&imodelId=1bda1dbc-f4ba-423a-b62a-d742ab3fe7fe&xhqbaseurl=https://en.wikipedia.org/&hideXhqNavbar=1",
+            "webRoot": "${workspaceFolder}"
+        },
+        {
+            "type": "chrome",
+            "request": "launch",
+            "name": "geospatial",
+            "url": "http://localhost:3000/?projectId=a3aa8dbb-1e64-453f-87b7-17bb2864c715&imodelId=f748a306-e47b-4351-b283-7bbbb2f61bd1&xhqbaseurl=https://en.wikipedia.org/&hideXhqNavbar=1",
+            "webRoot": "${workspaceFolder}"
         }
     ]
 }
