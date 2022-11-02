@@ -14,6 +14,7 @@ import "./CustomTableNodeTree.scss";
 import "./QueryEditor.scss";
 import { stringify } from "querystring";
 import Queries from "./queries.json";
+import { QueryEditorToolbar } from "./QueryEditorToolbar";
 
 
 interface IPopupLocationTuple {
@@ -294,6 +295,7 @@ export const QueryEditor = (props: QueryEditorProps) => {
       <Button styleType="high-visibility" onClick={runQuery}>
         {XhqViewsManager.translate("Generate")}
       </Button>
+      <QueryEditorToolbar />
       <Label htmlFor="text-input">
         Legend
       </Label>
