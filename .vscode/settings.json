@@ -6,7 +6,9 @@
         "**/CVS": true,
         "**/.DS_Store": true,
         "**/Thumbs.db": true,
-        "**/temp": true
+        "**/temp": true,
+        "**/build": true,
+        "**/node_modules": true
     },
     "explorerExclude.backup": {}
 }

@@ -16,7 +16,8 @@
     "@itwin/presentation-components": "~3.2.8",
     "@itwin/presentation-common": "~3.2.8",
     "@itwin/components-react": "~3.2.8",
-    "@itwin/itwinui-icons-react": "~1.16.0"    
+    "@itwin/itwinui-icons-react": "~1.16.0",
+    "@itwin/imodel-components-react": "~3.2.8"   
   },
   "dependencies": {
     "@bentley/spg-external-data-providers": "3.2.12",

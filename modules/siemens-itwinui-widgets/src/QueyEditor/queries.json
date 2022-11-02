@@ -1,0 +1,26 @@
+[
+    {
+        "value": "select * from ProcessPhysical.NAMED_ITEM",
+        "label": "Named Item"
+    },
+    {
+        "value": "select * from ProcessPhysical.GATE_VALVE",
+        "label": "Gate Value"
+    },
+    {
+        "value": "select * from ProcessPhysical.PUMP",
+        "label": "Pump"
+    },
+    {
+        "value": "SELECT 'No Detector' Condition, space.UserLabel, space.ecinstanceid EcInstanceId FROM BisCore.SpatialIndex room, ifcdynamic.ifcspace space, IFCDynamic.ifcAspect_Sonstige asp WHERE space.EcInstanceId = asp.Element.id AND asp.ifcKategorie = 'Räume' AND space.UserLabel LIKE '%WC%' AND room.ecinstanceid = space.ecinstanceid AND NOT EXISTS ( SELECT rt.ecinstanceid FROM BisCore.SpatialIndex rt, BisCore.element rook WHERE (rt.ECInstanceId MATCH iModel_spatial_overlap_aabb( iModel_bbox( room.MinX, room.MinY, room.MinZ, room.MaxX, room.MaxY, room.MaxZ))) AND rook.ecinstanceid = rt.ecinstanceid AND rook.UserLabel LIKE '%Rauchmelder%') UNION SELECT 'Has Detector' Condition, space.UserLabel, space.ecinstanceid EcInstanceId FROM BisCore.SpatialIndex room, ifcdynamic.ifcspace space, IFCDynamic.ifcAspect_Sonstige asp WHERE space.EcInstanceId = asp.Element.id AND asp.ifcKategorie = 'Räume' AND space.UserLabel LIKE '%WC%' AND room.ecinstanceid = space.ecinstanceid AND EXISTS ( SELECT rt.ecinstanceid FROM BisCore.SpatialIndex rt, BisCore.element rook WHERE (rt.ECInstanceId MATCH iModel_spatial_overlap_aabb( iModel_bbox( room.MinX, room.MinY, room.MinZ, room.MaxX, room.MaxY, room.MaxZ))) AND rook.ecinstanceid = rt.ecinstanceid AND rook.UserLabel LIKE '%Rauchmelder%')",
+        "label": "Smoke Detectors"
+    },
+    {
+        "value": "SELECT EcInstanceID EcInstanceId, ec_classname(EcClassId,'c') Codition, ec_classname(EcClassId,'s') SchemaName FROM BisCore.GeometricElement3d",
+        "label": "Get classes"
+    },
+    {
+        "value": "SELECT rel.SourceEcInstanceId EcInstanceId, strftime('%Y-%m-%d',LastMod) Condition From ProcessFunctional.NAMED_ITEM item, Biscore.ElementRefersToElements rel WHERE item.EcInstanceId = rel.TargetEcInstanceId",
+        "label": "last modified date"
+    }
+]

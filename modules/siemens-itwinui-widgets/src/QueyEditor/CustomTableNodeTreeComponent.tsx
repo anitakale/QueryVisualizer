@@ -5,12 +5,20 @@
 import React, { useEffect, useState } from "react";
 import { PropertyRecord } from "@itwin/appui-abstract";
 import {
+  CellProps,
   ControlledTree, DelayLoadedTreeNodeItem, ITreeDataProvider, PropertyValueRendererManager, SelectionMode, TreeActions, TreeDataChangesListener, TreeModelNode, TreeNodeItem, TreeNodeRendererProps, TreeRenderer, TreeRendererProps,
   useTreeEventsHandler, useTreeModel, useTreeModelSource, useTreeNodeLoader
 } from "@itwin/components-react";
 import { BeEvent } from "@itwin/core-bentley";
 import { ExpansionToggle } from "@itwin/core-react";
+import { ColorDef } from "@itwin/core-common";
+import { ColorMap } from "@itwin/core-frontend/lib/cjs/render/primitives/ColorMap";
+import { PropertyGroup } from "@itwin/presentation-common";
+import { ColorPickerPopup } from "@itwin/imodel-components-react";
 
+export interface CustomTableNodeTreeComponentProps {
+  legend: Map<string | undefined, { color: ColorDef, elements: string[] }>;
+}
 /**
  * This component demonstrates use `ControlledTree` with custom nodes rendering. It uses
  * `DataProvider` class to get some fake data to show. Tree by this component is rendered
@@ -20,13 +28,13 @@ import { ExpansionToggle } from "@itwin/core-react";
  * be passed to it. In this component 'nodeTableTreeRenderer' is used. It uses default
  * `TreeRenderer` with overridden node renderer.
  */
-export const CustomTableNodeTreeComponent = () => {
+export const CustomTableNodeTreeComponent = (props: CustomTableNodeTreeComponentProps) => {
   const [width, setWidth] = useState<number>(1000);
   const [height, setHeight] = useState<number>(1000);
 
   // create data provider to get some nodes to show in tree
   // `React.useMemo' is used avoid creating new object on each render cycle
-  const dataProvider = React.useMemo(() => new DataProvider(), []);
+  const dataProvider = React.useMemo(() => new DataProvider(props.legend), [props.legend]);
 
   // create model source for tree model. Model source contains tree model and provides an API to modify
   // model and listen for changes in tree model.
@@ -55,7 +63,7 @@ export const CustomTableNodeTreeComponent = () => {
   const model = useTreeModel(modelSource);
 
   useEffect(() => {
-    const viewerContainer = document.querySelector(".legend-container");
+    const viewerContainer = document.querySelector(".tree-wrapper");
     if (viewerContainer) {
       setWidth(viewerContainer.clientWidth);
       setHeight(viewerContainer.clientHeight);
@@ -75,6 +83,7 @@ export const CustomTableNodeTreeComponent = () => {
   }, []);
 
   return <>
+        
     <div className="custom-tree">
       <div className="tree-header">
         <span className="col-1">Label</span>
@@ -93,6 +102,7 @@ export const CustomTableNodeTreeComponent = () => {
         />
       </div>
     </div>
+
   </>;
 
 };
@@ -132,6 +142,11 @@ function NodeTable(props: { treeActions: TreeActions, node: TreeModelNode }) {
 
   const offset = props.node.depth * 20 + (props.node.numChildren === 0 ? 25 : 0);
 
+  const updateData = (_cellProps: {value: ColorDef, name: string}, _value: any) => {
+    // Todo we should have here the code to triger the update of the color map.
+    // unsure how to pass on a callback uptill this level.
+  };
+
   return (
     <div className="table-node">
       <div className="col-1" >
@@ -140,7 +155,9 @@ function NodeTable(props: { treeActions: TreeActions, node: TreeModelNode }) {
           {PropertyValueRendererManager.defaultManager.render(props.node.label)}
         </div>
       </div>
-      <div className="col-2">{props.node.item?.extendedData?.color}</div>
+      <div className="col-2">
+        <ColorPickerCell cellProps={props.node.item?.extendedData?.color} updateData={updateData} />
+      </div>
       <div className="col-3">{props.node.item?.extendedData?.size}</div>
     </div>
   );
@@ -148,45 +165,64 @@ function NodeTable(props: { treeActions: TreeActions, node: TreeModelNode }) {
 
 /** Data provider that is used to get some fake nodes */
 class DataProvider implements ITreeDataProvider {
+  colormap  :  Map<string | undefined, { color: ColorDef, elements: string[] }> = new Map();
+
+  constructor(_colormap: Map<string | undefined, { color: ColorDef, elements: string[] }>) {
+    this.colormap = _colormap;
+  }
+
+  updateMap(_colormap: Map<string | undefined, { color: ColorDef, elements: string[] }>) {
+    this.colormap = _colormap;
+  }
+
   public onTreeNodeChanged = new BeEvent<TreeDataChangesListener>();
   public async getNodesCount(parent?: TreeNodeItem) {
     if (parent === undefined)
-      return 3;
+      return this.colormap.size;
 
-    switch (parent.id) {
-      case "TestNode-1": return 3;
-      case "TestNode-2": return 3;
-      case "TestNode-3": return 2;
-      case "TestNode-3-1": return 2;
-      default: return 0;
-    }
+    const node = this.colormap.get(parent.id);
+    if(node === undefined)
+      return 0;
+    return node.elements.length
   }
-  public async getNodes(parent?: TreeNodeItem) {
-    if (parent === undefined)
-      return sampleTreeItems.slice(0, 3);
 
-    switch (parent.id) {
-      case "TestNode-1": return sampleTreeItems.slice(3, 6);
-      case "TestNode-2": return sampleTreeItems.slice(6, 9);
-      case "TestNode-3": return sampleTreeItems.slice(9, 11);
-      case "TestNode-3-1": return sampleTreeItems.slice(11);
-      default: return [];
-    }
+  public async getNodes(parent?: TreeNodeItem) {
+    if(parent == undefined) {
+      const result : DelayLoadedTreeNodeItem[] = [];
+      this.colormap.forEach((value, key) => {
+        result.push({
+          id: key!,
+          label: PropertyRecord.fromString(key!),
+          extendedData: { color: {value: value.color, name: key}, size: value.elements.length },
+          hasChildren: false
+        });
+      })
+      return result;
+    }  
+    return [];
   }
 }
 
-const sampleTreeItems: DelayLoadedTreeNodeItem[] = [
-  { id: "TestNode-1", label: PropertyRecord.fromString("TestNode 1"), extendedData: { color: "Red", size: "Small" }, hasChildren: true },
-  { id: "TestNode-2", label: PropertyRecord.fromString("TestNode 2"), extendedData: { color: "Blue", size: "Medium" }, hasChildren: true },
-  { id: "TestNode-3", label: PropertyRecord.fromString("TestNode 3"), extendedData: { color: "Green", size: "Big" }, hasChildren: true },
-  { id: "TestNode-1-1", label: PropertyRecord.fromString("TestNode 1-1"), extendedData: { color: "Red", size: "Small" } },
-  { id: "TestNode-1-2", label: PropertyRecord.fromString("TestNode 1-2"), extendedData: { color: "Red", size: "Small" } },
-  { id: "TestNode-1-3", label: PropertyRecord.fromString("TestNode 1-3"), extendedData: { color: "Red", size: "Small" } },
-  { id: "TestNode-2-1", label: PropertyRecord.fromString("TestNode 2-1"), extendedData: { color: "Blue", size: "Medium" } },
-  { id: "TestNode-2-2", label: PropertyRecord.fromString("TestNode 2-2"), extendedData: { color: "Blue", size: "Medium" } },
-  { id: "TestNode-2-3", label: PropertyRecord.fromString("TestNode 2-3"), extendedData: { color: "Blue", size: "Medium" } },
-  { id: "TestNode-3-1", label: PropertyRecord.fromString("TestNode 3-1"), extendedData: { color: "Green", size: "Big" }, hasChildren: true },
-  { id: "TestNode-3-2", label: PropertyRecord.fromString("TestNode 3-2"), extendedData: { color: "Green", size: "Big" } },
-  { id: "TestNode-3-1-1", label: PropertyRecord.fromString("TestNode 3-1-2"), extendedData: { color: "Green", size: "Big" } },
-  { id: "TestNode-3-1-2", label: PropertyRecord.fromString("TestNode 3-1-2"), extendedData: { color: "Green", size: "Big" } },
-];
+export const ColorPickerCell = (props: {
+  cellProps: {name: string, value: ColorDef};
+  updateData?: (
+    cellProps: {name: string, value: ColorDef},
+    color: ColorDef
+  ) => void;
+}) => {
+  // tslint:disable-line:variable-name
+  const { cellProps, updateData } = props;
+
+  const onClose = (color: ColorDef) => {
+    updateData?.(cellProps, color);
+  };
+
+  return (
+    <ColorPickerPopup
+      initialColor={cellProps.value}
+      onClose={onClose}
+      captureClicks={true}
+      colorInputType="hex"
+    />
+  );
+};

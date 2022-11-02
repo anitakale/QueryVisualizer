@@ -6,13 +6,15 @@ import { Logger } from "@itwin/core-bentley";
 import { MessageManager, ModelessDialog, useActiveViewport } from "@itwin/appui-react";
 import { XhqViewsManager } from "../XhqViewsManager";
 import { IXhqOptions } from "../XhqViewsDialog/interfaces";
-import { Button, Label, Input, Textarea } from "@itwin/itwinui-react";
+import { Button, Label, Input, Textarea, LabeledSelect, SelectOption } from "@itwin/itwinui-react";
 import { EmphasizeElements, IModelApp, NotifyMessageDetails, OutputMessageAlert, OutputMessagePriority, OutputMessageType, Viewport, ViewPose } from "@itwin/core-frontend";
 import { ColorDef, FeatureAppearance, FeatureOverrideType, HSVColor, QueryRowFormat } from "@itwin/core-common";
 import { CustomTableNodeTreeComponent } from "./CustomTableNodeTreeComponent";
 import "./CustomTableNodeTree.scss";
 import "./QueryEditor.scss";
 import { stringify } from "querystring";
+import Queries from "./queries.json";
+
 
 interface IPopupLocationTuple {
   xLocation: number;
@@ -26,6 +28,7 @@ export interface QueryEditorProps {
 }
 
 export const QueryEditor = (props: QueryEditorProps) => {
+  const [selectedValue, setSelectedValue] = useState<string>("");
   const viewport = useActiveViewport();
   let _xhqViewsDialogRef: Dialog | undefined;
   const dialogPosition = DialogStateCache.getPosition();
@@ -36,7 +39,7 @@ export const QueryEditor = (props: QueryEditorProps) => {
   // queryResults contains the full result of the query as is.
   const [queryResults, setQueryResults] = React.useState<any>([]);
   // Contains the condition mapped to color and an array of element ids (= ecinstance ids)
-  const [colorMap, setColorMap] = React.useState<Map<string|undefined, {color: ColorDef, elements: string[]}>>(new Map());
+  const [colorMap, setColorMap] = React.useState<Map<string | undefined, { color: ColorDef, elements: string[] }>>(new Map());
 
   React.useEffect(() => {
     return function cleanup() {
@@ -139,7 +142,7 @@ export const QueryEditor = (props: QueryEditorProps) => {
     : xLocationAndAlignemntComputed.yLocation;
 
   const runQuery = async (_event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-    if (!viewport) 
+    if (!viewport)
       return; // if there is no valid viewport there is no point to continue.
     try {
       const query = querytext;
@@ -165,20 +168,20 @@ export const QueryEditor = (props: QueryEditorProps) => {
       setQueryResults(elements);
 
       // Generate a colormap based on the results.
-      const colormap: Map<string|undefined, {color: ColorDef, elements: string[]}> = new Map();
+      const colormap: Map<string | undefined, { color: ColorDef, elements: string[] }> = new Map();
       for (const element of elements) {
         // Check if ecinstanceid is valid else skip the result.
         // This can happen with a query that provides 3d ids and null 3d ids if not aggregated.
         // See example mail. 
-        if(element.EcInstanceId === undefined || element.EcInstanceId === null)
+        if (element.EcInstanceId === undefined || element.EcInstanceId === null)
           continue;
-        if(colormap.has(element.Condition)) {
+        if (colormap.has(element.Condition)) {
           colormap.get(element.Condition)?.elements.push(element.EcInstanceId);
         }
         else {
           colormap.set(element.Condition, {
             color: ColorDef.fromHSV(
-                new HSVColor(randomInt(0,360), randomInt(60,100), 100)),
+              new HSVColor(randomInt(0, 360), randomInt(60, 100), 100)),
             elements: []
           });
           colormap.get(element.Condition)?.elements.push(element.EcInstanceId);
@@ -201,7 +204,7 @@ export const QueryEditor = (props: QueryEditorProps) => {
   };
 
   // Helper funcvtion for generating random colors.
-  const randomInt = (min: number, max: number)  => { 
+  const randomInt = (min: number, max: number) => {
     return Math.floor(Math.random() * (max - min + 1) + min)
   }
 
@@ -215,7 +218,7 @@ export const QueryEditor = (props: QueryEditorProps) => {
       emph.clearOverriddenElements(viewport);
       emph.clearIsolatedElements(viewport);
       let replace = true;
-      colorMap.forEach((value: {color: ColorDef, elements: string[]}, _key: string|undefined) => {
+      colorMap.forEach((value: { color: ColorDef, elements: string[] }, _key: string | undefined) => {
         emph.overrideElements(value.elements, viewport, value.color, FeatureOverrideType.ColorOnly, replace);
         emph.emphasizeElements(value.elements, viewport, undefined, replace);
         // This is a line to enable isolation. Will be needed for restrooms demo.
@@ -224,7 +227,7 @@ export const QueryEditor = (props: QueryEditorProps) => {
       });
       emph.wantEmphasis = true;
 
-      
+
       /* All elements that are not overridden are outside the box by default. So to color them we don't need to have elements ids.
       This is done so we would not need to query large amount of elements that are outside the box */
       // EmphasizeElements.;
@@ -244,6 +247,14 @@ export const QueryEditor = (props: QueryEditorProps) => {
     setQueryText(event.target.value)
   }
 
+  const getQueries = (): SelectOption<string>[] => {
+    return Queries.map((item: any) => {
+      return {
+        value: item.value,
+        label: item.label,
+      };
+    });
+  };
 
   return (
     <ModelessDialog
@@ -267,6 +278,13 @@ export const QueryEditor = (props: QueryEditorProps) => {
       dialogId={XHQ_VIEWS_DIALOG_ID}
     >
       <div className="QueryEditor-dialog-container">
+
+        <Label>Vizual Name</Label>
+        <select onChange={value => { setSelectedValue(value.currentTarget.innerText); setQueryText(value.currentTarget.value) }}>
+          {Queries.map((item) => (
+            <option value={item.value}>{item.label}</option>
+          ))}
+        </select>
         <Label htmlFor="text-input">
           Query
         </Label>
@@ -279,9 +297,12 @@ export const QueryEditor = (props: QueryEditorProps) => {
       <Label htmlFor="text-input">
         Legend
       </Label>
+     
       <div className="legend-container">
-        <CustomTableNodeTreeComponent />
+        <CustomTableNodeTreeComponent 
+          legend={colorMap} />
       </div>
+
       <Button styleType="high-visibility" onClick={applyQueryResults}>
         {XhqViewsManager.translate("Apply")}
       </Button>
