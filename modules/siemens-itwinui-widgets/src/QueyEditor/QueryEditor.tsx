@@ -244,6 +244,8 @@ export const QueryEditor = (props: QueryEditorProps) => {
       const emph = EmphasizeElements.getOrCreate(viewport);
       emph.clearEmphasizedElements(viewport);
       emph.clearOverriddenElements(viewport);
+      emph.clearIsolatedElements(viewport);
+      let replace = true;
       colorMap.forEach(
         (
           value: { color: ColorDef; elements: string[] },
@@ -254,9 +256,9 @@ export const QueryEditor = (props: QueryEditorProps) => {
             viewport,
             value.color,
             FeatureOverrideType.ColorOnly,
-            true
+            replace
           );
-          emph.emphasizeElements(value.elements, viewport);
+          emph.emphasizeElements(value.elements, viewport, undefined, replace);
         }
       );
       emph.wantEmphasis = true;
