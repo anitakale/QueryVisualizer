@@ -30,6 +30,11 @@ import {
 import { CustomTableNodeTreeComponent } from "./CustomTableNodeTreeComponent";
 import "./CustomTableNodeTree.scss";
 import "./QueryEditor.scss";
+import { stringify } from "querystring";
+import type { IData, IGroupedData } from "../BarChartDisplay/types";
+import { BarChart } from "../BarChartDisplay/BarChart";
+import { ToggleSwitch } from "@itwin/itwinui-react";
+import { AnyAaaaRecord } from "dns";
 import Queries from "./queries.json";
 
 interface IPopupLocationTuple {
@@ -51,15 +56,22 @@ export const QueryEditor = (props: QueryEditorProps) => {
   const [isDialogOpened, setIsDialogOpened] = useState(props.opened);
   const XHQ_VIEWS_DIALOG_ID = "query-views-dialog";
   // queryText contains the content of the Text area of the ecsql query.
-  const [querytext, setQueryText] = useState(
-    "SELECT rel.SourceEcInstanceId EcInstanceId, strftime('%Y-%m-%d',LastMod) Condition From ProcessFunctional.NAMED_ITEM item, Biscore.ElementRefersToElements rel WHERE item.EcInstanceId = rel.TargetEcInstanceId"
+  //const [querytext, setQueryText] = React.useState(
+  //"SELECT rel.SourceEcInstanceId EcInstanceId, strftime('%Y-%m-%d',LastMod) Condition From ProcessFunctional.NAMED_ITEM item, Biscore.ElementRefersToElements rel WHERE item.EcInstanceId = rel.TargetEcInstanceId"
+  //);
+  const [querytext, setQueryText] = React.useState(
+    "SELECT EcInstanceID EcInstanceId, ec_classname(EcClassId,'c') Condition, ec_classname(EcClassId,'s') as schemaname FROM BisCore.GeometricElement3d"
   );
+  //  "select ECInstanceId, count(UserLabel) Total, UserLabel, ECClassId From ProcessPhysical.Named_Item group by ECClassId Limit 5"
   // queryResults contains the full result of the query as is.
-  const [queryResults, setQueryResults] = useState<any>([]);
+  const [queryResults, setQueryResults] = React.useState<any>([]);
+  const [barchartdata, setBarChartResults] = React.useState<any>([]);
   // Contains the condition mapped to color and an array of element ids (= ecinstance ids)
-  const [colorMap, setColorMap] = useState<
+  const [colorMap, setColorMap] = React.useState<
     Map<string | undefined, { color: ColorDef; elements: string[] }>
   >(new Map());
+
+  const BAR_CHART_DATA: IData[] = [];
 
   React.useEffect(() => {
     return function cleanup() {
@@ -183,10 +195,10 @@ export const QueryEditor = (props: QueryEditorProps) => {
         //  throw "EcInstanceId is not defined in query as a column name.";
         elements.push(element);
       }
+
       // Set the results, so if we want to have an additional effect to display the results
       // We can do so, for example to update the chart.
       setQueryResults(elements);
-
       // Generate a colormap based on the results.
       const colormap: Map<
         string | undefined,
@@ -285,6 +297,43 @@ export const QueryEditor = (props: QueryEditorProps) => {
     setQueryText(event.target.value);
   };
 
+  const showChart = async (show: boolean) => {
+    const divContainer = document.getElementById("divBarChart");
+    if (divContainer) {
+      if (show) {
+        const groupByECClassId: [string, object] = queryResults.reduce(
+          (group: { [x: string]: any[] }, product: { schemaname: any }) => {
+            const { schemaname } = product;
+            group[schemaname] = group[schemaname] ?? [];
+            group[schemaname].push(product);
+            return group;
+          },
+          {}
+        );
+        console.log(groupByECClassId);
+        if (groupByECClassId) {
+          const data: [string, string | object][] =
+            Object.entries(groupByECClassId);
+          let countdata = 0;
+          for (let datacount = 0; datacount < data.length; datacount++) {
+            const output: any = data[datacount];
+            const barchartData: IData = {
+              label: output[0],
+              //value: element.Total,
+              value: parseInt(output[1].length),
+            };
+            countdata = countdata + 1;
+            BAR_CHART_DATA.push(barchartData);
+          }
+          setBarChartResults(BAR_CHART_DATA);
+          divContainer.style.display = "block";
+        }
+      } else {
+        divContainer.style.display = "none";
+      }
+    }
+  };
+
   return (
     <ModelessDialog
       id="queryeditor-dialog"
@@ -316,9 +365,20 @@ export const QueryEditor = (props: QueryEditorProps) => {
           }}
         >
           <option></option>
-          {Queries.map((item) => (
-            <option value={item.value}>{item.label}</option>
-          ))}
+          {Queries.map(
+            (item: {
+              value: string | number | readonly string[] | undefined;
+              label:
+                | boolean
+                | React.ReactChild
+                | React.ReactFragment
+                | React.ReactPortal
+                | null
+                | undefined;
+            }) => (
+              <option value={item.value}>{item.label}</option>
+            )
+          )}
         </select>
         <Label htmlFor="text-input">Query</Label>
         <Textarea
@@ -326,6 +386,7 @@ export const QueryEditor = (props: QueryEditorProps) => {
           onChange={handleChange}
           value={querytext}
         />
+        ,
       </div>
       <Button styleType="high-visibility" onClick={runQuery}>
         {XhqViewsManager.translate("Generate")}
@@ -340,6 +401,16 @@ export const QueryEditor = (props: QueryEditorProps) => {
       <Button styleType="high-visibility" onClick={applyQueryResults}>
         {XhqViewsManager.translate("Apply")}
       </Button>
+      <ToggleSwitch
+        label="Show Chart"
+        labelPosition="left"
+        onChange={(e) => showChart(e.target.checked)}
+      />
+      <div className="container" id="divBarChart">
+        <section>
+          <BarChart data={barchartdata} />
+        </section>
+      </div>
     </ModelessDialog>
   );
 };

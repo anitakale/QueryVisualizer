@@ -1,6 +1,15 @@
 
 .legend-container {
     height: 40%;
+}
+
+.container {
+    max-width: 40em;
+    width: 100%;
+    margin: 0 auto;
+    padding: 1em;
+    box-sizing: border-box;
+    display: none;
 }  
 
 .select-queries-label{
