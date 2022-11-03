@@ -38,7 +38,6 @@ import { AnyAaaaRecord } from "dns";
 import Queries from "./queries.json";
 import { QueryEditorToolbar } from "./QueryEditorToolbar";
 
-
 interface IPopupLocationTuple {
   xLocation: number;
   yLocation: number;
@@ -199,10 +198,9 @@ export const QueryEditor = (props: QueryEditorProps) => {
         // If for some reason the values are null for an object the property is not defined in json object,
         // if(element.EcInstanceId === null || element.EcInstanceId === undefined)
         //  throw "EcInstanceId is not defined in query as a column name.";
-        if(element.Condition === undefined) { 
+        if (element.Condition === undefined) {
           element.Condition = "undefined";
-        }
-        else if(element.Condition === null) { 
+        } else if (element.Condition === null) {
           element.Condition = "null";
         }
         elements.push(element);
@@ -222,7 +220,7 @@ export const QueryEditor = (props: QueryEditorProps) => {
         // See example mail.
         if (element.EcInstanceId === undefined || element.EcInstanceId === null)
           continue;
-        
+
         if (colormap.has(element.Condition)) {
           colormap.get(element.Condition)?.elements.push(element.EcInstanceId);
         } else {
@@ -358,20 +356,24 @@ export const QueryEditor = (props: QueryEditorProps) => {
     }
   };
 
-
-  const toggleEmphasize = async () => { 
+  const toggleEmphasize = async () => {
     if (!viewport) return;
     try {
       const emph = EmphasizeElements.getOrCreate(viewport);
       emph.clearEmphasizedElements(viewport);
-      if(!useEmphasize) {
+      if (!useEmphasize) {
         let replace = true;
         colorMap.forEach(
           (
             value: { color: ColorDef; elements: string[] },
             _key: string | undefined
           ) => {
-            emph.emphasizeElements(value.elements, viewport, undefined, replace);
+            emph.emphasizeElements(
+              value.elements,
+              viewport,
+              undefined,
+              replace
+            );
             replace = false;
           }
         );
@@ -395,14 +397,14 @@ export const QueryEditor = (props: QueryEditorProps) => {
         );
       }
     }
-  }
+  };
 
-  const toggleIsolate = async () => { 
+  const toggleIsolate = async () => {
     if (!viewport) return;
     try {
       const emph = EmphasizeElements.getOrCreate(viewport);
       emph.clearIsolatedElements(viewport);
-      if(!useIsolate) {
+      if (!useIsolate) {
         let replace = true;
         colorMap.forEach(
           (
@@ -433,9 +435,7 @@ export const QueryEditor = (props: QueryEditorProps) => {
         );
       }
     }
-  }
- 
-
+  };
 
   return (
     <ModelessDialog
@@ -489,33 +489,22 @@ export const QueryEditor = (props: QueryEditorProps) => {
           onChange={handleChange}
           value={querytext}
         />
-        
       </div>
       <Button styleType="high-visibility" onClick={runQuery}>
         {XhqViewsManager.translate("Generate")}
       </Button>
-      <QueryEditorToolbar 
-        onEmphasize={toggleEmphasize} 
+      <QueryEditorToolbar
+        onEmphasize={toggleEmphasize}
         isEmphasize={useEmphasize}
         onIsolate={toggleIsolate}
         isIsolate={useIsolate}
       />
-      <Label htmlFor="text-input">
-        Legend
-      </Label>
-     
+      <Label htmlFor="text-input">Legend</Label>
       <div className="legend-container">
-        <CustomTableNodeTreeComponent 
-          legend={colorMap} />
+        <CustomTableNodeTreeComponent legend={colorMap} />
       </div>
-      <Button styleType="high-visibility">
-        {XhqViewsManager.translate("Save")}
-      </Button>
-      <Button styleType="high-visibility" onClick={applyQueryResults}>
-        {XhqViewsManager.translate("Apply")}
-      </Button>
       <ToggleSwitch
-        label="Show Chart"
+        label="Show Statistics"
         labelPosition="left"
         onChange={(e) => showChart(e.target.checked)}
       />
@@ -524,6 +513,16 @@ export const QueryEditor = (props: QueryEditorProps) => {
           <BarChart data={barchartdata} />
         </section>
       </div>
+      <Button styleType="high-visibility">
+        {XhqViewsManager.translate("Save")}
+      </Button>
+      <Button
+        styleType="high-visibility"
+        className="buttonMargin"
+        onClick={applyQueryResults}
+      >
+        {XhqViewsManager.translate("Apply")}
+      </Button>
     </ModelessDialog>
   );
 };
