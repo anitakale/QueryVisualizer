@@ -26,5 +26,8 @@
     {
         "value": "SELECT elm.EcInstanceId tagid, elm.CodeValue tagname, rel2d.SourceEcInstanceId tag2did, rel3d.SourceEcInstanceId EcInstanceId, iif( NOT rel2d.SourceEcInstanceId IS NULL AND NOT rel3d.SourceEcInstanceId IS NULL, '2D and 3D', iif( NOT rel2d.SourceEcInstanceId IS NULL, '2D', iif( NOT rel3d.SourceEcInstanceId IS NULL, '3D', 'red'))) Condition FROM ProcessFunctional.NAMED_ITEM elm LEFT JOIN Functional.DrawingGraphicRepresentsFunctionalElement rel2d ON elm.EcinstanceId = rel2d.TargetEcInstanceId LEFT JOIN Functional.PhysicalElementFulfillsFunction rel3d ON elm.EcinstanceId = rel3d.TargetEcInstanceId WHERE NOT codevalue is NULL",
         "label": "Cross probing status"
-    }
+    },
+    {
+        "value": "WITH pipeelm(id,label,condition, temp) AS (select EcInstanceId EcInstanceId, UserLabel, 'pressure < 400' Condition, NORMAL_OPERATING_TEMPERATURE-273.15 FROM ProcessPhysical.PIPING_NETWORK_SYSTEM WHERE (NORMAL_OPERATING_PRESSURE-101325)/1000.0 < 400 UNION select EcInstanceId EcInstanceId, UserLabel, '400 <= pressure < 450' Condition, NORMAL_OPERATING_TEMPERATURE-273.15 FROM ProcessPhysical.PIPING_NETWORK_SYSTEM WHERE (NORMAL_OPERATING_PRESSURE-101325)/1000.0 > 400 AND (NORMAL_OPERATING_PRESSURE-101325)/1000.0 < 450 UNION select EcInstanceId EcInstanceId, UserLabel, '450 <= pressure' Condition, NORMAL_OPERATING_TEMPERATURE-273.15 FROM ProcessPhysical.PIPING_NETWORK_SYSTEM WHERE (NORMAL_OPERATING_PRESSURE-101325)/1000.0 >= 450) SELECT child2.EcInstanceId EcInstanceId, pipe.condition Condition FROM pipeelm pipe, Biscore.Element child, Biscore.Element child2 WHERE child.Parent.id = pipe.id AND child2.Parent.id = child.ecinstanceid",
+        "label": "High pressure pipes"    }
 ]
