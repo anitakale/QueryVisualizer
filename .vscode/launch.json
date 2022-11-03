@@ -8,7 +8,7 @@
             "type": "chrome",
             "request": "launch",
             "name": "Launch Chrome against localhost",
-            "url": "http://localhost:3000/?projectId=e2d5af89-f469-4490-a17a-9c1ac5807a7b&changesetId=ebab9c84a3ac96b632b07a67899ab1cd674b2b09&imodelId=0fb98067-181f-497c-8335-340e6257faa2&xhqbaseurl=https://en.wikipedia.org/&hideXhqNavbar=1",
+            "url": "http://localhost:3000/?projectId=e2d5af89-f469-4490-a17a-9c1ac5807a7b&imodelId=0fb98067-181f-497c-8335-340e6257faa2&changesetId=ddb3f605d0413c16d1a08917078fcec170877569&xhqbaseurl=https://en.wikipedia.org/&hideXhqNavbar=1",
             "webRoot": "${workspaceFolder}"
         },
         {
