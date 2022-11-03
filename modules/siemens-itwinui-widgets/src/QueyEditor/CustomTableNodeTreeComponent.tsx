@@ -88,7 +88,6 @@ export const CustomTableNodeTreeComponent = (props: CustomTableNodeTreeComponent
       <div className="tree-header">
         <span className="col-1">Label</span>
         <span className="col-2">Color</span>
-        <span className="col-3">Size</span>
       </div>
       <div className="tree-wrapper">
         <ControlledTree
@@ -158,7 +157,6 @@ function NodeTable(props: { treeActions: TreeActions, node: TreeModelNode }) {
       <div className="col-2">
         <ColorPickerCell cellProps={props.node.item?.extendedData?.color} updateData={updateData} />
       </div>
-      <div className="col-3">{props.node.item?.extendedData?.size}</div>
     </div>
   );
 }
@@ -193,7 +191,7 @@ class DataProvider implements ITreeDataProvider {
         result.push({
           id: key!,
           label: PropertyRecord.fromString(key!),
-          extendedData: { color: {value: value.color, name: key}, size: value.elements.length },
+          extendedData: { color: {value: value.color, name: key} },
           hasChildren: false
         });
       })
