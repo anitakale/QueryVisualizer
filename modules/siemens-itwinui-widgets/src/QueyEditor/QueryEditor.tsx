@@ -117,12 +117,12 @@ export const QueryEditor = (props: QueryEditorProps) => {
   };
 
   const getLocationOfPopup = (
-    proposedWidth: number,
-    proposedHeight: number
+    _proposedWidth: number,
+    _proposedHeight: number
   ) => {
     let returnValue = {
-      xLocation: window.innerWidth - proposedWidth - 90,
-      yLocation: window.innerHeight - proposedHeight - 90,
+      xLocation: 60,
+      yLocation: 60,
       alignment: DialogAlignment.Center,
     };
     const translatedTitle = XhqViewsManager.translate("xhqViewsDialog");
@@ -167,7 +167,7 @@ export const QueryEditor = (props: QueryEditorProps) => {
     : 400;
   const height = dialogPosition.heightViewPortDialog
     ? dialogPosition.heightViewPortDialog
-    : 350;
+    : 720;
   const xLocationAndAlignemntComputed: IPopupLocationTuple = getLocationOfPopup(
     width,
     height
@@ -440,7 +440,7 @@ export const QueryEditor = (props: QueryEditorProps) => {
   return (
     <ModelessDialog
       id="queryeditor-dialog"
-      title={XhqViewsManager.translate("Query Vizualiser")}
+      title={XhqViewsManager.translate("QueryVizualiser")}
       opened={isDialogOpened}
       resizable={true}
       movable={true}
@@ -489,7 +489,7 @@ export const QueryEditor = (props: QueryEditorProps) => {
           onChange={handleChange}
           value={querytext}
         />
-        ,
+        
       </div>
       <Button styleType="high-visibility" onClick={runQuery}>
         {XhqViewsManager.translate("Generate")}

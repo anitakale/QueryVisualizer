@@ -10,5 +10,6 @@
       "confirmationMessage": "Press Confirm to continue or Cancel to stay on same page."
     },
     "navigateToLinkTitle":"Go To Operational Intelligence"
-  }
+  },
+  "QueryVizualiser": "Query Vizualiser"
 }
