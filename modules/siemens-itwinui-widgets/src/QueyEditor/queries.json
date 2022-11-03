@@ -22,5 +22,9 @@
     {
         "value": "SELECT EcInstanceID EcInstanceId, ec_classname(EcClassId,'c') Condition, ec_classname(EcClassId,'s') as schemaname FROM BisCore.GeometricElement3d",
         "label": "Chart Query"
+    },
+    {
+        "value": "SELECT elm.EcInstanceId tagid, elm.CodeValue tagname, rel2d.SourceEcInstanceId tag2did, rel3d.SourceEcInstanceId EcInstanceId, iif( NOT rel2d.SourceEcInstanceId IS NULL AND NOT rel3d.SourceEcInstanceId IS NULL, '2D and 3D', iif( NOT rel2d.SourceEcInstanceId IS NULL, '2D', iif( NOT rel3d.SourceEcInstanceId IS NULL, '3D', 'red'))) Condition FROM ProcessFunctional.NAMED_ITEM elm LEFT JOIN Functional.DrawingGraphicRepresentsFunctionalElement rel2d ON elm.EcinstanceId = rel2d.TargetEcInstanceId LEFT JOIN Functional.PhysicalElementFulfillsFunction rel3d ON elm.EcinstanceId = rel3d.TargetEcInstanceId WHERE NOT codevalue is NULL",
+        "label": "Cross probing status"
     }
 ]
