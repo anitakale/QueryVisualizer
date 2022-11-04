@@ -10,7 +10,7 @@ import {
 import { ModelessDialogManager, StateManager } from "@itwin/appui-react";
 import { XhqViewsDialogStartup } from "../Components/XhqViewsDialogStartup";
 import { SiemensSampleAppActions } from "../Store/SiemensSampleAppStore";
-import { ReactComponent as xhqIcon } from "E:/PlantSight/Hackathon2022/QueryVisualizer/apps/simple-host/src/Icons/xhq-view.svg";
+import { ReactComponent as xhqIcon } from "../Icons/xhq-view.svg";
 import { IXhqOptions } from "@bentley/siemens-itwinui-widgets";
 
 export interface AppUIProviderProps {
